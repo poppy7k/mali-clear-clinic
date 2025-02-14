@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script type="module" src="../components/layouts/layout-navbar.js" defer></script>
+    <script src="../scripts/auth/register.js" defer></script>
+</head>
+<body class="bg-gray-100">
+    <layout-navbar></layout-navbar>
+    <div class="flex items-center justify-center my-20">
+        <div class="bg-white p-8 rounded-lg shadow-md w-full sm:w-96">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-4">Create an Account</h2>
+            
+            <form id="registerForm">
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" id="username" name="username" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                    <input type="email" id="email" name="email" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="password" name="password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        Sign Up
+                    </button>
+                </div>
+            </form>
+
+            <p class="mt-4 text-center text-sm text-gray-600">Already have an account? <a href="login.html" class="text-indigo-600 hover:text-indigo-700">Login</a></p>
+        </div>
+    </div>
+</body>
+</html>

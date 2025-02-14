@@ -1,0 +1,293 @@
+* {
+    margin: 0 auto;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #F8F5F2;
+    font-family: 'prompt', sans-serif;
+  }
+
+/*************************navbar**************************/
+
+.navbar {
+  display: flex;
+  align-items: center;
+  position:relative;
+  width: 100%;
+  background-color: #ffffff;
+}
+
+/* ปรับโลโก้ */
+.navbar .logo img {
+  height: 70px;
+  background: #ffffff;
+}
+
+/* ปรับเมนูให้อยู่ในแถวเดียวกัน */
+.navbar .nav-links {
+  list-style: none;
+  background: none;
+  margin-top: 15px;
+}
+.navbar .nav-links ul {
+  background: none;
+}
+.navbar .nav-links li {
+  display: inline;
+  margin: 0 20px;
+  background: none;
+}
+/* ปรับลิงก์เมนู */
+.navbar .nav-links a {
+  text-decoration: none;
+  color: #9C8E80; /* สีเทา/เบจ */
+  font-size: 20px;
+  font-weight: 300;
+  background: none;
+}
+/* ปรับขนาดฟอนต์ของ Home */
+.navbar .home-link {
+  font-size: 25px !important;  /* ขนาดฟอนต์ที่ต้องการ */
+  font-weight: 600 !important; /* ทำให้ตัวหนากว่า */
+}
+
+/* เปลี่ยนสีเมื่อ Hover */
+.navbar .nav-links:hover {
+  color: #5F4B3A; /* สีน้ำตาลอ่อน */
+}
+/* ปรับปุ่ม Booknow */
+.navbar .nav-links .booknow-btn {
+  background-color: #EFDECB;
+  color: #AE8D69;
+  border: none;
+  padding: 10px 35px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* เปลี่ยนสีปุ่มเมื่อ Hover */
+.navbar .nav-links .booknow-btn:hover {
+  background-color: #AE8D69;
+  color: #FFF;
+}
+
+/*************************end-navbar**************************/
+
+/*************************hero**************************/
+.hero {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  height: 55vh; /* ให้ความสูงเต็มหน้าจอ */
+}
+.hero .container-hero{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1300px;
+  min-width: auto;
+}
+.hero-content {
+  text-align: center;
+  margin-left: 80px;
+}
+.hero-content .mali {
+  font-family: 'amiri-quran';
+  font-size: 3.5rem;
+  font-weight: 500;
+  color: #5a3e36;
+  margin-bottom: -10px;
+}
+.hero-content .beauty {
+  font-family: 'amiri-quran';
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: #a88c7d;
+}
+.hero-content .lead {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #CDAE8C;
+  margin-top: 0;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #9B7F5D;
+  padding-bottom: 10px;
+}
+.book-now {
+  text-decoration: none;
+  font-size:1.5rem;
+  font-weight: 600;
+  padding: 10px 60px;
+  background-color: #EFDECB;
+  border: none;
+  color: #AE8D69;
+  cursor: pointer;
+  border-radius: 30px;
+}
+.book-now:hover {
+  background-color: #AE8D69;
+  color: #FFF;
+}
+.hero-image img {
+  height: 350px;
+  width: 1200px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment:fixed;
+  background-size: cover;
+  border-radius: 30px;
+  box-shadow: black 0 0 2px;
+}
+/*************************end-hero**************************/
+
+/*************************promotions**************************/
+.promotion {
+  display: block;
+  justify-content: center;
+  height: 100vh; /* ให้ความสูงเต็มหน้าจอ */
+  padding-top: 3rem;
+}
+.promotion .container-promotion{
+  display: block;
+  justify-content: center;
+  max-width: 1200px;
+}
+.promotion-title {
+  color :#8B6846;
+  text-align: center;
+  font-size: 2.5rem;
+}
+.promotion-item{
+  margin-top: 1rem;
+  color: #AE8D69;
+  text-align: center;
+}
+.promotion .promotion-item .pro-img{
+  width: 200px;
+  height: 200px;
+  border-radius: 10px;
+  box-shadow: black 0 0 2px;
+}
+.promotion .promotion-content{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  font-size: 20px;
+}
+/*************************Login**************************/
+.login-container {
+  margin-top: 5%;
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 350px;
+}
+.login-container h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+.input-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+.input-group label {
+  display: block;
+  font-size: 18px;
+  color: #555;
+  margin-bottom: 5px;
+}
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 18px;
+}
+.btn {
+  width: 100%;
+  padding: 10px;
+  background: #EFDECB;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.btn:hover {
+  background: #AE8D69;
+  color: #FFF;
+}
+.register-link {
+  margin-top: 15px;
+  font-size: 16px;
+}
+.register-link a {
+  color: #e4b637;
+  text-decoration: none;
+}
+.register-link a:hover {
+  text-decoration: underline;
+}
+/*************************end-login**************************/
+
+/*************************register**************************/
+.register-container {
+  margin-top: 2%;
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 350px;
+}
+.register-container h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+.input-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+.input-group label {
+  display: block;
+  font-size: 18px;
+  color: #555;
+  margin-bottom: 5px;
+}
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 18px;
+}
+.btn {
+  width: 100%;
+  padding: 10px;
+  background: #f3e9df;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.btn:hover {
+  background: #8B6846;
+}
+.login-link {
+  margin-top: 15px;
+  font-size: 16px;
+}
+.login-link a {
+  color: #e4b637;
+  text-decoration: none;
+}
+.login-link a:hover {
+  text-decoration: underline;
+}
+/*************************end-register**************************/
