@@ -29,7 +29,7 @@ class MyBookings extends HTMLElement {
             const bookingList = this.querySelector("#booking-list");
             bookingList.innerHTML = bookings.length > 0
                 ? bookings.map(booking => `
-                    <tr class="hover:bg-gray-100">
+                    <tr class="border-b border-gray-200 text-gray-700">
                         <td class="p-3">${booking.id}</td>
                         <td class="p-3">${booking.product_name}</td>
                         <td class="p-3">${booking.booking_date}</td>
@@ -46,10 +46,10 @@ class MyBookings extends HTMLElement {
         this.innerHTML = `
             <div class="container mx-auto p-6">
                 <h2 class="text-2xl font-bold mb-4">My Bookings</h2>
-                <div class="overflow-x-auto bg-white shadow-md rounded-lg p-4">
+                <div class="overflow-x-auto bg-white border border-gray-200 shadow-md rounded-lg p-4">
                     <table class="w-full border-collapse">
-                        <thead>
-                            <tr class="bg-gray-200 text-gray-700">
+                        <thead class="border-b border-gray-200">
+                            <tr class="text-gray-800 font-semibold">
                                 <th class="p-3 text-left">Booking ID</th>
                                 <th class="p-3 text-left">Product</th>
                                 <th class="p-3 text-left">Date</th>

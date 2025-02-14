@@ -57,9 +57,6 @@ class Booking {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    
-    
-
     // ดึงข้อมูลการจองตาม ID
     public function readById($id) {
         $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";

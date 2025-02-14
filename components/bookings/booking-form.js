@@ -21,14 +21,9 @@ class BookingForm extends HTMLElement {
 
     async handleFormSubmit(event) {
         event.preventDefault();
-        const userName = this.querySelector('#user-name').value;
         const bookingDate = this.querySelector('#booking-date').value;
 
-        if (!userName || !bookingDate) {
-            return;
-        }
-
-        const response = await this.submitBooking(userName, bookingDate);
+        const response = await this.submitBooking(bookingDate);
         if (response.status === 'success') {
             this.showSuccessMessage();
         } else {
@@ -36,7 +31,7 @@ class BookingForm extends HTMLElement {
         }
     }
 
-    async submitBooking(userName, bookingDate) {
+    async submitBooking(bookingDate) {
         try {
             const response = await fetch('/mali-clear-clinic/api/Booking.php', {
                 method: 'POST',
@@ -47,7 +42,6 @@ class BookingForm extends HTMLElement {
                     user_id: 4,  // Replace with actual user ID
                     product_id: this.productId,  // ใช้ this.productId ที่กำหนดไว้ใน getProductDetailsFromUrl
                     booking_date: bookingDate,
-                    user_name: userName,
                 }),
             });
             return await response.json();
