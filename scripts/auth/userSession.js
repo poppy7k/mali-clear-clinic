@@ -16,3 +16,19 @@ export async function getUserSession() {
         return null;
     }
 }
+
+export async function logout() {
+    try {
+        const response = await fetch('/mali-clear-clinic/Services/Auth/LogoutService.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+        if (data.status === 'success') {
+            window.location.href = "/mali-clear-clinic/index.html";
+        }
+    } catch (error) {
+        console.error('Error logging out:', error);
+    }
+}

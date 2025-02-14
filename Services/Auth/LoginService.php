@@ -1,7 +1,7 @@
 <?php
 header("Content-Type: application/json");
-require_once '../../Controllers/User.php';
-require_once '../../Controllers/Database.php';
+require_once '../../Models/User.php';
+require_once '../../Models/Database.php';
 
 session_start(); // เริ่ม session
 $database = new Database();

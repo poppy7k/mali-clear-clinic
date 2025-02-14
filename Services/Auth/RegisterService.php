@@ -1,7 +1,7 @@
 <?php
 header("Content-Type: application/json"); // กำหนดให้ Response เป็น JSON
-require_once '../../Controllers/User.php';
-require_once '../../Controllers/Database.php';
+require_once '../../Models/User.php';
+require_once '../../Models/Database.php';
 
 $database = new Database();
 $db = $database->getConnection();

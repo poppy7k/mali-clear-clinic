@@ -1,4 +1,4 @@
-import { getUserSession } from '/mali-clear-clinic/scripts/auth/userSession.js';
+import { getUserSession, logout } from '/mali-clear-clinic/scripts/auth/userSession.js';
 
 class CustomNavbar extends HTMLElement {
     constructor() {
@@ -72,10 +72,16 @@ class CustomNavbar extends HTMLElement {
         // อัปเดต navbar ด้วยข้อมูลของผู้ใช้
         document.getElementById("login-link").innerHTML = `
             <span>Welcome, ${user.username}</span>
-            <a href="/mali-clear-clinic/pages/logout.php" class="py-2 px-4 border-2 rounded-[22px] transition-all duration-300 hover:bg-yellow-400 hover:text-black hover:fill-black">
+            <a href="/mali-clear-clinic/pages/my-booking.html" class="py-2 px-4 border-2 rounded-[22px] transition-all duration-300 hover:bg-yellow-400 hover:text-black hover:fill-black">
+                My Bookings
+            </a>
+            <a id="logout-btn" class="py-2 px-4 border-2 rounded-[22px] transition-all duration-300 hover:bg-yellow-400 hover:text-black hover:fill-black">
                 Logout
             </a>
         `;
+        document.getElementById("logout-btn").addEventListener("click", async () => {
+            await logout();
+        });
     }
 }
 
