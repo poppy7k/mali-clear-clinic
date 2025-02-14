@@ -15,31 +15,11 @@ class CustomNavbar extends HTMLElement {
                     </a>
                     <div class="hidden w-full md:block md:w-auto" id="navbar-default">
                         <ul class="font-medium flex flex-row rounded-lg text-gray-600 gap-4 text-lg font-semibold items-center" id="navbar-links">
-                            <li class="text-lg transition-all duration-300 hover:text-yellow-400 py-2 px-3">
-                                <a href="/mali-clear-clinic/index.html" class="">
-                                    Home
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="py-2 px-3 transition-all duration-300 hover:text-yellow-400">
-                                    Services
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="py-2 px-3 transition-all duration-300 hover:text-yellow-400">
-                                    Promotion
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="py-2 px-3 transition-all duration-300 hover:text-yellow-400">
-                                    Blog & Tips
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="py-2 px-3 transition-all duration-300 hover:text-yellow-400">
-                                    Contact Us
-                                </a>
-                            </li>
+                            <custom-button href="/mali-clear-clinic/index.html" text="Home" hoverBg="white" hoverText="yellow-400" color="gray-600" class="w-max"></custom-button>
+                            <custom-button href="/mali-clear-clinic/pages/service.html" text="Services" hoverBg="white" hoverText="yellow-400" color="gray-600" class="w-max"></custom-button>
+                            <custom-button href="#" text="Promotions" hoverBg="white" hoverText="yellow-400" color="gray-600" class="w-max"></custom-button>
+                            <custom-button href="#" text="Blog & Tips" hoverBg="white" hoverText="yellow-400" color="gray-600" class="w-max"></custom-button>
+                            <custom-button href="#" text="Contact Us" hoverBg="white" hoverText="yellow-400" color="gray-600" class="w-max"></custom-button>
                             <li id="login-link">
                             </li>
                         </ul>

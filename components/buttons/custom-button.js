@@ -13,7 +13,7 @@ class CustomButton extends HTMLElement {
         const hoverText = this.getAttribute("hoverText") || "black";
         const id = this.getAttribute("id");
         const addClass = this.getAttribute("class");
-        const bgColor = this.getAttribute("bgColor");
+        const bgColor = this.getAttribute("bgColor") || "white";
         const type = this.getAttribute("type");
 
         // สร้างตัวแปรสำหรับเก็บ URL ของ SVG
@@ -37,7 +37,7 @@ class CustomButton extends HTMLElement {
 
     renderButton(iconHtml, text, color, href, hoverBg, hoverText, id, addClass, bgColor, type) {
         this.innerHTML = `
-            <button onclick="window.location.href='${href}'" type="${type}" id="${id}" class="${addClass} bg-${bgColor} justify-center flex items-center text-${color} fill-${color} gap-2 py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-300 hover:bg-${hoverBg} hover:text-${hoverText}">
+            <button onclick="window.location.href='${href}'" type="${type}" id="${id}" class="${addClass} bg-${bgColor} justify-center flex items-center text-${color} fill-${color} gap-2 py-2 px-4 rounded-lg font-semibold transition-all duration-300 hover:bg-${hoverBg} hover:text-${hoverText} cursor-pointer">
                 ${iconHtml ? `<span class="h-5 w-5">${iconHtml}</span>` : ''}
                 <span>${text}</span>
             </button>
