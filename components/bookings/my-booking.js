@@ -3,7 +3,6 @@ import { getUserSession } from "/mali-clear-clinic/scripts/auth/userSession.js";
 class MyBookings extends HTMLElement {
     constructor() {
         super();
-        // ไม่ต้องใช้ shadow DOM จึงไม่ต้อง attachShadow
     }
 
     async connectedCallback() {

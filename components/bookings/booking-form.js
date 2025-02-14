@@ -1,3 +1,5 @@
+import { getUserSession } from "/mali-clear-clinic/scripts/auth/userSession.js";
+
 class BookingForm extends HTMLElement {
     constructor() {
         super();
@@ -6,8 +8,14 @@ class BookingForm extends HTMLElement {
         this.appendChild(templateContent.cloneNode(true));  // แทนที่การใช้ shadowRoot ด้วยการเพิ่มลงในตัว element หลัก
     }
 
-    connectedCallback() {
+    async connectedCallback() {
         this.getProductDetailsFromUrl();
+        const user = await getUserSession();
+        if (!user) {
+            window.location.href = "/mali-clear-clinic/pages/login.html";
+            return;
+        }
+        this.userId = user.user_id;
         const bookingForm = this.querySelector('#booking-form'); // ใช้ querySelector แทนการเข้าถึงใน shadowRoot
         bookingForm.addEventListener('submit', this.handleFormSubmit.bind(this));
     }
@@ -22,6 +30,11 @@ class BookingForm extends HTMLElement {
     async handleFormSubmit(event) {
         event.preventDefault();
         const bookingDate = this.querySelector('#booking-date').value;
+
+        if (!this.userId) {
+            alert('You must be logged in to book a product.');
+            return;
+        }
 
         const response = await this.submitBooking(bookingDate);
         if (response.status === 'success') {
@@ -39,8 +52,8 @@ class BookingForm extends HTMLElement {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    user_id: 4,  // Replace with actual user ID
-                    product_id: this.productId,  // ใช้ this.productId ที่กำหนดไว้ใน getProductDetailsFromUrl
+                    user_id: this.userId,
+                    product_id: this.productId, 
                     booking_date: bookingDate,
                 }),
             });

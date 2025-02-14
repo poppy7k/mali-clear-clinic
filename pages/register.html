@@ -9,6 +9,7 @@
     <script src="../scripts/auth/register.js" defer></script>
 
     <script src="../components/buttons/custom-button.js" defer></script>
+    <script src="../components/form/form-input.js" defer></script>
 </head>
 <body class="bg-gray-100">
     <layout-navbar></layout-navbar>
@@ -19,22 +20,21 @@
             <form id="registerForm">
                 <div class="mb-4">
                     <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-                    <input type="text" id="username" name="username" class="w-full my-2 px-3 py-2 rounded-lg ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-600 transition-all duration-300 outline-none" required>
+                    <form-input type="text" id="username" name="username" required></form-input>
                 </div>
-
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                    <input type="email" id="email" name="email" class="w-full my-2 px-3 py-2 rounded-lg ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-600 transition-all duration-300 outline-none" required>
+                    <form-input type="email" id="email" name="email" required></form-input>
                 </div>
 
                 <div class="mb-4">
                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <input type="password" id="password" name="password" class="w-full my-2 px-3 py-2 rounded-lg ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-600 transition-all duration-300 outline-none" required>
+                    <form-input type="password" id="password" name="password" required></form-input>
                 </div>
 
                 <div class="mb-4">
                     <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" class="w-full my-2 px-3 py-2 rounded-lg ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-600 transition-all duration-300 outline-none" required>
+                    <form-input type="password" id="confirm_password" name="confirm_password" required></form-input>
                 </div>
 
                 <div class="flex items-center justify-between">

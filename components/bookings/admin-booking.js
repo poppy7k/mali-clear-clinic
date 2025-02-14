@@ -6,7 +6,6 @@ class AdminBooking extends HTMLElement {
     }
 
     async connectedCallback() {
-        // เช็ค role ของผู้ใช้จาก session หรือ API
         const user = await getUserSession();
         if (user.role !== 'ADMIN') {
             window.location.href = "/mali-clear-clinic/index.html";
