@@ -70,15 +70,28 @@ class CustomNavbar extends HTMLElement {
 
     updateNavbarWithUser(user) {
         // อัปเดต navbar ด้วยข้อมูลของผู้ใช้
-        document.getElementById("login-link").innerHTML = `
-            <span>Welcome, ${user.username}</span>
-            <a href="/mali-clear-clinic/pages/my-booking.html" class="py-2 px-4 border-2 rounded-[22px] transition-all duration-300 hover:bg-yellow-400 hover:text-black hover:fill-black">
-                My Bookings
-            </a>
-            <a id="logout-btn" class="py-2 px-4 border-2 rounded-[22px] transition-all duration-300 hover:bg-yellow-400 hover:text-black hover:fill-black">
-                Logout
-            </a>
-        `;
+        if (user.role === 'ADMIN') {
+            document.getElementById("login-link").innerHTML = `
+                <span>Welcome, ${user.username}</span>
+                <a href="/mali-clear-clinic/pages/admin-booking.html" class="py-2 px-4 border-2 rounded-[22px] transition-all duration-300 hover:bg-yellow-400 hover:text-black hover:fill-black">
+                    Admin Bookings
+                </a>
+                <a id="logout-btn" class="py-2 px-4 border-2 rounded-[22px] transition-all duration-300 hover:bg-yellow-400 hover:text-black hover:fill-black">
+                    Logout
+                </a>
+            `;
+        } else {
+            document.getElementById("login-link").innerHTML = `
+                <span>Welcome, ${user.username}</span>
+                <a href="/mali-clear-clinic/pages/my-booking.html" class="py-2 px-4 border-2 rounded-[22px] transition-all duration-300 hover:bg-yellow-400 hover:text-black hover:fill-black">
+                    My Bookings
+                </a>
+                <a id="logout-btn" class="py-2 px-4 border-2 rounded-[22px] transition-all duration-300 hover:bg-yellow-400 hover:text-black hover:fill-black">
+                    Logout
+                </a>
+            `;
+        }
+        
         document.getElementById("logout-btn").addEventListener("click", async () => {
             await logout();
         });

@@ -9,6 +9,7 @@ class User {
     public $username;
     public $email;
     public $password;
+    public $role; // ✅ เพิ่มตัวแปร role
     public $created_at;
 
     public function __construct($db) {
@@ -22,7 +23,7 @@ class User {
             username VARCHAR(50) NOT NULL UNIQUE,
             email VARCHAR(100) NOT NULL UNIQUE,
             password VARCHAR(255) NOT NULL,
-            role VARCHAR(20) DEFAULT 'USER',
+            role VARCHAR(20) DEFAULT 'USER', -- ✅ เพิ่ม role เป็นค่าเริ่มต้น 'USER'
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )";
 
@@ -30,21 +31,18 @@ class User {
         $stmt->execute();
     }
 
-    // ฟังก์ชันสำหรับสมัครสมาชิก
+    // ✅ ฟังก์ชันสมัครสมาชิก (เก็บ role)
     public function register() {
-        // SQL Statement สำหรับการสมัครสมาชิก
         $query = "INSERT INTO " . $this->table_name . " (username, email, password, role) VALUES (:username, :email, :password, :role)";
         
-        // เตรียมคำสั่ง SQL
         $stmt = $this->conn->prepare($query);
 
         // กำหนดค่าพารามิเตอร์
         $stmt->bindParam(':username', $this->username);
         $stmt->bindParam(':email', $this->email);
         $stmt->bindParam(':password', $this->password);
-        $stmt->bindValue(':role', 'USER');
+        $stmt->bindValue(':role', $this->role ?? 'USER'); // ✅ ใช้ role ที่กำหนด หรือ 'USER' เป็นค่าเริ่มต้น
 
-        // ตรวจสอบการบันทึกข้อมูล
         if ($stmt->execute()) {
             return true;
         }
@@ -52,7 +50,7 @@ class User {
         return false;
     }
 
-    // ฟังก์ชันสำหรับตรวจสอบว่าอีเมล์ซ้ำหรือไม่
+    // ✅ ฟังก์ชันตรวจสอบว่าอีเมล์ซ้ำหรือไม่
     public function emailExists() {
         $query = "SELECT id, username, email, password FROM " . $this->table_name . " WHERE email = ? LIMIT 0,1";
         
@@ -67,20 +65,20 @@ class User {
         return false;
     }
 
-    // ฟังก์ชันสำหรับเข้าสู่ระบบ
+    // ✅ ฟังก์ชันล็อกอิน (ดึง role ด้วย)
     public function login() {
-        $query = "SELECT id, username, password FROM " . $this->table_name . " WHERE email = :email LIMIT 0,1";
+        $query = "SELECT id, username, password, role FROM " . $this->table_name . " WHERE email = :email LIMIT 0,1";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':email', $this->email);
         $stmt->execute();
 
-        // หากพบข้อมูล
         if ($stmt->rowCount() > 0) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if (password_verify($this->password, $row['password'])) {
-                $this->id = $row['id'];        // ดึงค่า user_id
-                $this->username = $row['username']; // ดึงค่า username
+                $this->id = $row['id'];        // ✅ เก็บ user_id
+                $this->username = $row['username']; // ✅ เก็บ username
+                $this->role = $row['role'];    // ✅ เก็บ role
                 return true;
             }
         }

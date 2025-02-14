@@ -1,9 +1,18 @@
+import { getUserSession } from "/mali-clear-clinic/scripts/auth/userSession.js";
+
 class AdminBooking extends HTMLElement {
     constructor() {
         super();
     }
 
     async connectedCallback() {
+        // เช็ค role ของผู้ใช้จาก session หรือ API
+        const user = await getUserSession();
+        if (user.role !== 'ADMIN') {
+            window.location.href = "/mali-clear-clinic/index.html";
+            return;
+        }
+        
         this.render();
         this.loadBookings();
     }

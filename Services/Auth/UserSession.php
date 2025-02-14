@@ -1,5 +1,5 @@
 <?php
-session_start(); // เริ่มต้น session
+session_start(); // เริ่ม session
 header("Content-Type: application/json");
 
 // Debug: ดูค่า session ID และ session ที่ถูกเก็บไว้
@@ -13,7 +13,8 @@ if (isset($_SESSION['user_id'])) {
         "user" => [
             "user_id" => $_SESSION['user_id'],
             "username" => $_SESSION['username'],
-            "email" => $_SESSION['email']
+            "email" => $_SESSION['email'],
+            "role" => $_SESSION['role'],
         ]
     ]);
 } else {

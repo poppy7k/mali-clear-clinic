@@ -47,14 +47,17 @@ class Booking {
 
     // ดึงข้อมูลการจองทั้งหมด
     public function readAll() {
-        $sql = "SELECT b.id, b.product_id, p.name AS product_name, b.booking_date, b.status
+        $sql = "SELECT b.id, b.product_id, p.name AS product_name, b.booking_date, b.status, b.user_id, u.username
                 FROM bookings b
-                JOIN products p ON b.product_id = p.id";
-    
+                JOIN products p ON b.product_id = p.id
+                JOIN users u ON b.user_id = u.id";
+        
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    
+    
     
 
     // ดึงข้อมูลการจองตาม ID
