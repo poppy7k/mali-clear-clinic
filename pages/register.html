@@ -8,7 +8,7 @@
     <script type="module" src="../components/layouts/layout-navbar.js" defer></script>
     <script src="../scripts/auth/register.js" defer></script>
 
-    <script src="components/buttons/custom-button.js" defer></script>
+    <script src="../components/buttons/custom-button.js" defer></script>
 </head>
 <body class="bg-gray-100">
     <layout-navbar></layout-navbar>
@@ -19,32 +19,30 @@
             <form id="registerForm">
                 <div class="mb-4">
                     <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-                    <input type="text" id="username" name="username" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                    <input type="text" id="username" name="username" class="w-full my-2 px-3 py-2 rounded-lg ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-600 transition-all duration-300 outline-none" required>
                 </div>
 
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                    <input type="email" id="email" name="email" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                    <input type="email" id="email" name="email" class="w-full my-2 px-3 py-2 rounded-lg ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-600 transition-all duration-300 outline-none" required>
                 </div>
 
                 <div class="mb-4">
                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <input type="password" id="password" name="password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                    <input type="password" id="password" name="password" class="w-full my-2 px-3 py-2 rounded-lg ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-600 transition-all duration-300 outline-none" required>
                 </div>
 
                 <div class="mb-4">
                     <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                    <input type="password" id="confirm_password" name="confirm_password" class="w-full my-2 px-3 py-2 rounded-lg ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-600 transition-all duration-300 outline-none" required>
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        Sign Up
-                    </button>
+                    <custom-button type="submit" text="Sign Up" bgColor="green-500" hoverBg="green-400" hoverText="white" color="white" class="w-full"></custom-button>
                 </div>
             </form>
 
-            <p class="mt-4 text-center text-sm text-gray-600">Already have an account? <a href="login.html" class="text-indigo-600 hover:text-indigo-700">Login</a></p>
+            <p class="mt-4 text-center text-sm text-gray-600">Already have an account? <a href="login.html" class="text-green-600 hover:text-green-700">Login</a></p>
         </div>
     </div>
 </body>
