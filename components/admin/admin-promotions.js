@@ -31,17 +31,19 @@ class AdminPromotions extends HTMLElement {
     }
 
     async deletePromotion(id) {
-        try {
-            const response = await fetch(`/mali-clear-clinic/api/Promotion.php?id=${id}`, {
-                method: 'DELETE'
-            });
-            const result = await response.json();
-            if (result.status === 'success') {
-                await this.loadPromotions();
-                this.render();
+        if (confirm('คุณต้องการลบโปรโมชั่นนี้ใช่หรือไม่?')) {
+            try {
+                const response = await fetch(`/mali-clear-clinic/api/v1/Promotion.php?id=${id}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    await this.loadPromotions();
+                    this.render();
+                }
+            } catch (error) {
+                console.error('Error deleting promotion:', error);
             }
-        } catch (error) {
-            console.error('Error deleting promotion:', error);
         }
     }
 
@@ -142,10 +144,14 @@ class AdminPromotions extends HTMLElement {
                                     <td class="py-3 px-6 text-left">${promo.title}</td>
                                     <td class="py-3 px-6 text-left">${promo.description}</td>
                                     <td class="py-3 px-6 text-center">
-                                        <button onclick="this.closest('admin-promotions').deletePromotion(${promo.id})"
-                                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded transition-all duration-300">
-                                            ลบ
-                                        </button>
+                                        <custom-button 
+                                            onclick="this.closest('admin-promotions').deletePromotion(${promo.id})"
+                                            text="ลบ"
+                                            bg="red-500"
+                                            hoverBg="red-600"
+                                            color="white"
+                                            class="w-max">
+                                        </custom-button>
                                     </td>
                                 </tr>
                             `).join('')}
