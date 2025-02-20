@@ -24,12 +24,6 @@ try {
         exit;
     }
 
-    // ตรวจสอบสิทธิ์ ADMIN สำหรับ POST, PUT, DELETE
-    session_start();
-    if (!isset($_SESSION['userRole']) || $_SESSION['userRole'] !== 'ADMIN') {
-        throw new Exception("Unauthorized access");
-    }
-
     if ($method === 'POST') {
         // จัดการอัพโหลดรูปภาพ
         if (!isset($_FILES['image'])) {
