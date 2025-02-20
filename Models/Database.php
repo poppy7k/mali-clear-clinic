@@ -29,16 +29,19 @@ class Database {
         require_once 'Category.php';
         require_once 'Product.php';
         require_once 'Booking.php';
+        require_once 'Promotion.php';
 
         $user = new User($this->conn);
         $category = new Category($this->conn);
         $product = new Product($this->conn);
         $booking = new Booking($this->conn);
+        $promotion = new Promotion($this->conn);
 
         $user->createTableIfNotExists();
         $category->createTableIfNotExists();
         $product->createTableIfNotExists();
         $booking->createTableIfNotExists();
+        $promotion->createTableIfNotExists();
     }
 }
 ?>

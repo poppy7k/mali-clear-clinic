@@ -72,14 +72,23 @@ class CustomNavbar extends HTMLElement {
                                     Manage Bookings
                                 </a>
                             </li>
+                            <li class="px-1 py-2 rounded-md hover:bg-gray-100 hover:text-black">
+                                <a href="/mali-clear-clinic/pages/admin-promotions.html" class="px-1 flex text-sm text-gray-600 flex items-center gap-2 fill-gray-600">
+                                    <svg class="h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M21.5,2H2.5A2.5,2.5,0,0,0,0,4.5v15A2.5,2.5,0,0,0,2.5,22h19A2.5,2.5,0,0,0,24,19.5V4.5A2.5,2.5,0,0,0,21.5,2ZM22,19.5A.5.5,0,0,1,21.5,20H2.5a.5.5,0,0,1-.5-.5V4.5A.5.5,0,0,1,2.5,4h19a.5.5,0,0,1,.5.5Z"/>
+                                        <path d="M12,7a3,3,0,1,0,3,3A3,3,0,0,0,12,7Zm0,4a1,1,0,1,1,1-1A1,1,0,0,1,12,11Z"/>
+                                        <path d="M5,15a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V16A1,1,0,0,0,5,15Z"/>
+                                        <path d="M19,15a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V16A1,1,0,0,0,19,15Z"/>
+                                    </svg>
+                                    Manage Promotions
+                                </a>
+                            </li>
                         </ul>
                         <ul class="py-2">
                             <li class="px-1 py-2 rounded-md hover:bg-gray-100 hover:text-black">
                                 <a href="/mali-clear-clinic/pages/my-booking.html" class="px-1 flex text-sm text-gray-600 flex items-center gap-2 fill-gray-600">
                                     <svg class="h-5" xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 24 24"><path d="M22.2,2.163a4.992,4.992,0,0,0-4.1-1.081l-3.822.694A4,4,0,0,0,12,3.065,4,4,0,0,0,9.716,1.776L5.9,1.082A5,5,0,0,0,0,6V16.793a5,5,0,0,0,4.105,4.919l6.286,1.143a9,9,0,0,0,3.218,0L19.9,21.712A5,5,0,0,0,24,16.793V6A4.983,4.983,0,0,0,22.2,2.163ZM11,20.928c-.084-.012-.168-.026-.252-.041L4.463,19.745A3,3,0,0,1,2,16.793V6A3,3,0,0,1,5,3a3.081,3.081,0,0,1,.54.049l3.82.7A2,2,0,0,1,11,5.712Zm11-4.135a3,3,0,0,1-2.463,2.952l-6.285,1.142c-.084.015-.168.029-.252.041V5.712a2,2,0,0,1,1.642-1.968l3.821-.7A3,3,0,0,1,22,6Z"/></svg>
-                                    <span>
-                                        My Bookings
-                                    </span>
+                                    <span>My Bookings</span>
                                 </a>
                             </li>
                             <li class="px-1 py-2 rounded-md hover:bg-gray-100 hover:text-black">
@@ -87,9 +96,7 @@ class CustomNavbar extends HTMLElement {
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-red-500">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
                                     </svg>
-                                    <span class="text-red-500">
-                                        Logout
-                                    </span>
+                                    <span class="text-red-500">Logout</span>
                                 </button>
                             </li>
                         </ul>
