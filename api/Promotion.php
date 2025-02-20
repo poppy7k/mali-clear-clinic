@@ -17,15 +17,11 @@ $method = $_SERVER['REQUEST_METHOD'];
 try {
     if ($method === 'GET') {
         $promotions = $promotion->getAllPromotions();
-        echo json_encode([
-            "status" => "success",
-            "data" => $promotions
-        ]);
+        echo json_encode(["status" => "success", "data" => $promotions]);
         exit;
     }
 
     if ($method === 'POST') {
-        // จัดการอัพโหลดรูปภาพ
         if (!isset($_FILES['image'])) {
             throw new Exception("No image file uploaded");
         }
@@ -40,10 +36,7 @@ try {
             $promotion->image = $imageName;
             
             if ($promotion->create()) {
-                echo json_encode([
-                    "status" => "success", 
-                    "message" => "Promotion created successfully"
-                ]);
+                echo json_encode(["status" => "success", "message" => "Promotion created successfully"]);
             } else {
                 throw new Exception("Failed to create promotion");
             }
@@ -54,32 +47,29 @@ try {
     }
 
     if ($method === 'DELETE') {
-        // รับข้อมูล JSON จาก request body
-        $data = json_decode(file_get_contents("php://input"), true);
-        
-        if (!isset($data['id'])) {
+        // รองรับ id ทั้งจาก query string และ JSON body
+        $id = $_GET['id'] ?? null;
+        if (!$id) {
+            $data = json_decode(file_get_contents("php://input"), true);
+            $id = $data['id'] ?? null;
+        }
+
+        if (!$id) {
             throw new Exception("Missing promotion ID");
         }
 
-        if ($promotion->delete($data['id'])) {
-            echo json_encode([
-                "status" => "success",
-                "message" => "Promotion deleted successfully"
-            ]);
+        if ($promotion->delete($id)) {
+            echo json_encode(["status" => "success", "message" => "Promotion deleted successfully"]);
         } else {
             throw new Exception("Failed to delete promotion");
         }
         exit;
     }
 
-    // ถ้าไม่ได้รับ method ที่ถูกต้อง
     throw new Exception("Invalid request method");
 
 } catch (Exception $e) {
     http_response_code(400);
-    echo json_encode([
-        "status" => "error",
-        "message" => $e->getMessage()
-    ]);
+    echo json_encode(["status" => "error", "message" => $e->getMessage()]);
 }
-?> 
+?>
