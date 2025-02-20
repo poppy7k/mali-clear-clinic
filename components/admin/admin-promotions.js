@@ -33,16 +33,24 @@ class AdminPromotions extends HTMLElement {
     async deletePromotion(id) {
         if (confirm('คุณต้องการลบโปรโมชั่นนี้ใช่หรือไม่?')) {
             try {
-                const response = await fetch(`/mali-clear-clinic/api/v1/Promotion.php?id=${id}`, {
-                    method: 'DELETE'
+                const response = await fetch('/mali-clear-clinic/api/v1/Promotion.php', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: id })
                 });
+                
                 const result = await response.json();
                 if (result.status === 'success') {
                     await this.loadPromotions();
                     this.render();
+                } else {
+                    throw new Error(result.message || 'Failed to delete promotion');
                 }
             } catch (error) {
                 console.error('Error deleting promotion:', error);
+                alert('ไม่สามารถลบโปรโมชั่นได้ กรุณาลองใหม่อีกครั้ง');
             }
         }
     }
@@ -147,10 +155,9 @@ class AdminPromotions extends HTMLElement {
                                         <custom-button 
                                             onclick="this.closest('admin-promotions').deletePromotion(${promo.id})"
                                             text="ลบ"
-                                            bg="red-500"
                                             hoverBg="red-600"
-                                            color="white"
-                                            class="w-max">
+                                            color="red-500"
+                                            class="w-full">
                                         </custom-button>
                                     </td>
                                 </tr>

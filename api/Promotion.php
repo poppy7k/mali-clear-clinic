@@ -60,14 +60,16 @@ try {
     }
 
     if ($method === 'DELETE') {
-        if (!isset($_GET['id'])) {
+        // รับข้อมูล JSON จาก request body
+        $data = json_decode(file_get_contents("php://input"), true);
+        
+        if (!isset($data['id'])) {
             throw new Exception("Missing promotion ID");
         }
 
-        $id = $_GET['id'];
-        if ($promotion->delete($id)) {
+        if ($promotion->delete($data['id'])) {
             echo json_encode([
-                "status" => "success", 
+                "status" => "success",
                 "message" => "Promotion deleted successfully"
             ]);
         } else {
