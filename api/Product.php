@@ -5,8 +5,8 @@ header("Content-Type: application/json");
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once '../Models/Database.php';
-require_once '../Models/Product.php';
+require_once (__DIR__ . '/../Models/Database.php');
+require_once (__DIR__ . '/../Models/Product.php');
 
 // สร้างการเชื่อมต่อกับฐานข้อมูล
 $database = new Database();

@@ -61,15 +61,20 @@ class CustomNavbar extends HTMLElement {
                     <button id="profile-btn" class="py-2 px-2 rounded-[22px] transition-all duration-300 fill-gray-700 cursor-pointer hover:fill-yellow-400 hover:scale-125">
                         <svg class="h-5" xmlns="http://www.w3.org/2000/svg" id="Outline" viewBox="0 0 24 24"><path d="M12,12A6,6,0,1,0,6,6,6.006,6.006,0,0,0,12,12ZM12,2A4,4,0,1,1,8,6,4,4,0,0,1,12,2Z"/><path d="M12,14a9.01,9.01,0,0,0-9,9,1,1,0,0,0,2,0,7,7,0,0,1,14,0,1,1,0,0,0,2,0A9.01,9.01,0,0,0,12,14Z"/></svg>
                     </button>
-                    <div id="dropdown" class="absolute right-0 mt-2 w-52 bg-white border-1 border-gray-300 rounded-lg shadow-lg hidden divide-y-1 divide-gray-300 px-4 py-2">
+                    <div id="dropdown" class="absolute right-0 mt-2 w-52 bg-white border-1 border-gray-300 rounded-lg shadow-lg hidden px-4 py-2">
                         <div class="px-1 pt-1 pb-2">
                             @${user.username}
+                        </div>
+                        <div class="relative flex py-0 items-center">
+                            <div class="flex-grow border-t border-gray-300"></div>
+                            <span class="flex-shrink mx-2 text-gray-400 font-semibold text-sm">Admin</span>
+                            <div class="flex-grow border-t border-gray-300"></div>
                         </div>
                         <ul class="py-2">
                             <li class="px-1 py-2 rounded-md hover:bg-gray-100 hover:text-black">
                                 <a href="/mali-clear-clinic/pages/admin-booking.html" class="px-1 flex text-sm text-gray-600 flex items-center gap-2 fill-gray-600">
                                     <svg class="h-5" xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 24 24"><path d="M22.2,2.163a4.992,4.992,0,0,0-4.1-1.081l-3.822.694A4,4,0,0,0,12,3.065,4,4,0,0,0,9.716,1.776L5.9,1.082A5,5,0,0,0,0,6V16.793a5,5,0,0,0,4.105,4.919l6.286,1.143a9,9,0,0,0,3.218,0L19.9,21.712A5,5,0,0,0,24,16.793V6A4.983,4.983,0,0,0,22.2,2.163ZM11,20.928c-.084-.012-.168-.026-.252-.041L4.463,19.745A3,3,0,0,1,2,16.793V6A3,3,0,0,1,5,3a3.081,3.081,0,0,1,.54.049l3.82.7A2,2,0,0,1,11,5.712Zm11-4.135a3,3,0,0,1-2.463,2.952l-6.285,1.142c-.084.015-.168.029-.252.041V5.712a2,2,0,0,1,1.642-1.968l3.821-.7A3,3,0,0,1,22,6Z"/></svg>
-                                    Manage Bookings
+                                    Bookings
                                 </a>
                             </li>
                             <li class="px-1 py-2 rounded-md hover:bg-gray-100 hover:text-black">
@@ -80,10 +85,14 @@ class CustomNavbar extends HTMLElement {
                                         <path d="M5,15a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V16A1,1,0,0,0,5,15Z"/>
                                         <path d="M19,15a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V16A1,1,0,0,0,19,15Z"/>
                                     </svg>
-                                    Manage Promotions
+                                    Promotions
                                 </a>
                             </li>
                         </ul>
+                        <div class="relative flex py-0 items-center">
+                            <div class="flex-grow border-t border-gray-300"></div>
+                            <div class="flex-grow border-t border-gray-300"></div>
+                        </div>
                         <ul class="py-2">
                             <li class="px-1 py-2 rounded-md hover:bg-gray-100 hover:text-black">
                                 <a href="/mali-clear-clinic/pages/my-booking.html" class="px-1 flex text-sm text-gray-600 flex items-center gap-2 fill-gray-600">
