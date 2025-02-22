@@ -2,10 +2,7 @@ class ProductServiceList extends HTMLElement {
     constructor() {
         super();
         this.selectedCategory = "";
-        this.selectedType = "all"; // เพิ่ม state สำหรับเก็บประเภทที่เลือก
-    }
-
-    async connectedCallback() {
+        this.selectedType = "all";
         this.innerHTML = `
             <div class="container mx-auto py-2">
                 <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Our Products and Services</h2>
@@ -16,18 +13,36 @@ class ProductServiceList extends HTMLElement {
                         <div class="mb-6">
                             <h3 class="text-lg font-semibold mb-3 text-gray-800">ประเภท</h3>
                             <div class="flex flex-col space-y-2">
-                                <button class="type-btn text-left px-4 py-2 rounded hover:bg-yellow-50 transition-colors ${this.selectedType === 'all' ? 'bg-yellow-100 text-yellow-700' : ''}" 
-                                        data-type="all">
-                                    🏷️ ทั้งหมด
-                                </button>
-                                <button class="type-btn text-left px-4 py-2 rounded hover:bg-yellow-50 transition-colors ${this.selectedType === 'SERVICE' ? 'bg-yellow-100 text-yellow-700' : ''}" 
-                                        data-type="SERVICE">
-                                    💆‍♀️ บริการ
-                                </button>
-                                <button class="type-btn text-left px-4 py-2 rounded hover:bg-yellow-50 transition-colors ${this.selectedType === 'PRODUCT' ? 'bg-yellow-100 text-yellow-700' : ''}" 
-                                        data-type="PRODUCT">
-                                    🛍️ สินค้า
-                                </button>
+                                <custom-button 
+                                    class="type-btn w-full"
+                                    text="ทั้งหมด"
+                                    color="${this.selectedType === 'all' ? 'yellow-700' : 'gray-700'}"
+                                    bgColor="${this.selectedType === 'all' ? 'yellow-100' : 'white'}"
+                                    hoverBg="yellow-50"
+                                    data-type="all"
+                                    icon="grid"
+                                    align="left">
+                                </custom-button>
+                                <custom-button 
+                                    class="type-btn w-full"
+                                    text="บริการ"
+                                    color="${this.selectedType === 'SERVICE' ? 'yellow-700' : 'gray-700'}"
+                                    bgColor="${this.selectedType === 'SERVICE' ? 'yellow-100' : 'white'}"
+                                    hoverBg="yellow-50"
+                                    data-type="SERVICE"
+                                    icon="clock"
+                                    align="left">
+                                </custom-button>
+                                <custom-button 
+                                    class="type-btn w-full"
+                                    text="สินค้า"
+                                    color="${this.selectedType === 'PRODUCT' ? 'yellow-700' : 'gray-700'}"
+                                    bgColor="${this.selectedType === 'PRODUCT' ? 'yellow-100' : 'white'}"
+                                    hoverBg="yellow-50"
+                                    data-type="PRODUCT"
+                                    icon="shopping-bag"
+                                    align="left">
+                                </custom-button>
                             </div>
                         </div>
 
@@ -51,23 +66,20 @@ class ProductServiceList extends HTMLElement {
         
         // ใช้ MutationObserver สำหรับ category-list
         this.setupCategoryObserver();
+    }
 
+    async connectedCallback() {
         await this.fetchProducts();
     }
 
     setupEventListeners() {
         const typeButtons = this.querySelectorAll('.type-btn');
-        typeButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // อัปเดต UI ของปุ่ม
-                typeButtons.forEach(b => {
-                    b.classList.remove('bg-yellow-100', 'text-yellow-700');
-                });
-                btn.classList.add('bg-yellow-100', 'text-yellow-700');
-                
-                // อัปเดต state และโหลดข้อมูลใหม่
-                this.selectedType = btn.dataset.type;
+        typeButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const type = e.currentTarget.getAttribute('data-type');
+                this.selectedType = type;
                 this.fetchProducts();
+                this.render();
             });
         });
     }
@@ -145,11 +157,76 @@ class ProductServiceList extends HTMLElement {
 
     showNoProductsMessage() {
         const productList = this.querySelector('#productServiceList');
-        productList.innerHTML = `
-            <div class="col-span-full text-center text-gray-500 py-8">
+        productList.innerHTML = ` <div class="col-span-full text-center text-gray-500 py-8">
                 ไม่พบสินค้าหรือบริการในหมวดหมู่ที่เลือก
             </div>
         `;
+    }
+
+    render() {
+        this.innerHTML = `
+            <div class="container mx-auto py-2">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Our Products and Services</h2>
+                
+                <div class="flex gap-6">
+                    <!-- Filters Section -->
+                    <div class="w-1/4 bg-white rounded-lg shadow-md p-4">
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-3 text-gray-800">ประเภท</h3>
+                            <div class="flex flex-col space-y-2">
+                                <custom-button 
+                                    class="type-btn w-full"
+                                    text="ทั้งหมด"
+                                    color="${this.selectedType === 'all' ? 'yellow-700' : 'gray-700'}"
+                                    bgColor="${this.selectedType === 'all' ? 'yellow-100' : 'white'}"
+                                    hoverBg="yellow-50"
+                                    data-type="all"
+                                    icon="grid"
+                                    align="left">
+                                </custom-button>
+
+                                <custom-button 
+                                    class="type-btn w-full"
+                                    text="บริการ"
+                                    color="${this.selectedType === 'SERVICE' ? 'yellow-700' : 'gray-700'}"
+                                    bgColor="${this.selectedType === 'SERVICE' ? 'yellow-100' : 'white'}"
+                                    hoverBg="yellow-50"
+                                    data-type="SERVICE"
+                                    icon="clock"
+                                    align="left">
+                                </custom-button>
+
+                                <custom-button 
+                                    class="type-btn w-full"
+                                    text="สินค้า"
+                                    color="${this.selectedType === 'PRODUCT' ? 'yellow-700' : 'gray-700'}"
+                                    bgColor="${this.selectedType === 'PRODUCT' ? 'yellow-100' : 'white'}"
+                                    hoverBg="yellow-50"
+                                    data-type="PRODUCT"
+                                    icon="shopping-bag"
+                                    align="left">
+                                </custom-button>
+                            </div>
+                        </div>
+
+                        <div class="border-t pt-4">
+                            <h3 class="text-lg font-semibold mb-3 text-gray-800">หมวดหมู่</h3>
+                            <category-list class="flex flex-col"></category-list>
+                        </div>
+                    </div>
+
+                    <!-- Products Grid -->
+                    <div class="w-3/4">
+                        <div id="productServiceList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // ตั้งค่า event listeners หลังจาก render
+        this.setupEventListeners();
+        this.setupCategoryObserver();
     }
 }
 

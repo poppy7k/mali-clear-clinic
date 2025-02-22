@@ -15,6 +15,7 @@ class CustomButton extends HTMLElement {
         const addClass = this.getAttribute("class");
         const bgColor = this.getAttribute("bgColor") || "white";
         const type = this.getAttribute("type");
+        const align = this.getAttribute("align") || "center";
 
         // สร้างตัวแปรสำหรับเก็บ URL ของ SVG
         const iconUrl = `/mali-clear-clinic/assets/icons/${icon}.html`;
@@ -24,20 +25,20 @@ class CustomButton extends HTMLElement {
             fetch(iconUrl)
                 .then(response => response.text())
                 .then(svgContent => {
-                    this.renderButton(svgContent, text, color, href, hoverBg, hoverText, id, addClass, bgColor, type);
+                    this.renderButton(svgContent, text, color, href, hoverBg, hoverText, id, addClass, bgColor, type, align);
                 })
                 .catch(err => {
                     console.error("Error loading SVG:", err);
-                    this.renderButton('', text, color, href, hoverBg, hoverText, id, addClass, bgColor, type);
+                    this.renderButton('', text, color, href, hoverBg, hoverText, id, addClass, bgColor, type, align);
                 });
         } else {
-            this.renderButton('', text, color, href, hoverBg, hoverText, id, addClass, bgColor, type);
+            this.renderButton('', text, color, href, hoverBg, hoverText, id, addClass, bgColor, type, align);
         }
     }
 
-    renderButton(iconHtml, text, color, href, hoverBg, hoverText, id, addClass, bgColor, type) {
+    renderButton(iconHtml, text, color, href, hoverBg, hoverText, id, addClass, bgColor, type, align) {
         this.innerHTML = `
-            <button onclick="window.location.href='${href}'" type="${type}" id="${id}" class="${addClass} bg-${bgColor} justify-center flex items-center text-${color} fill-${color} gap-2 py-2 px-4 rounded-lg font-semibold transition-all duration-300 hover:bg-${hoverBg} hover:text-${hoverText} cursor-pointer">
+            <button onclick="window.location.href='${href}'" type="${type}" id="${id}" class="${addClass} bg-${bgColor} flex items-center text-${color} fill-${color} gap-2 py-2 px-4 rounded-lg font-semibold transition-all duration-300 hover:bg-${hoverBg} hover:text-${hoverText} cursor-pointer ${align === 'left' ? 'justify-start' : 'justify-center'}">
                 ${iconHtml ? `<span class="h-5 w-5">${iconHtml}</span>` : ''}
                 <span>${text}</span>
             </button>

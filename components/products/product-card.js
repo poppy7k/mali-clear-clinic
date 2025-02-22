@@ -36,7 +36,7 @@ class ProductCard extends HTMLElement {
                 <div class="p-4">
                     <h3 class="text-xl font-semibold mb-2">${this.product.name}</h3>
                     <p class="text-gray-600 mb-4">${this.product.description}</p>
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center gap-10">
                         <span class="text-lg font-bold text-green-600">฿${this.product.price}</span>
                         ${this.renderActionButton()}
                     </div>
@@ -51,21 +51,29 @@ class ProductCard extends HTMLElement {
         if (this.product.type === 'SERVICE') {
             return `
                 <custom-button 
-                    id="bookButton"
-                    text="จองบริการ"
-                    bg="green-500"
-                    hoverBg="green-600"
-                    color="white">
+                    text="จองคิว"
+                    color="white"
+                    bgColor="green-600"
+                    hoverBg="green-500"
+                    type="button"
+                    hoverText="white"
+                    class="w-full text-sm"
+                    icon="calendar"
+                    onclick="window.location.href='/mali-clear-clinic/pages/booking.html'">
                 </custom-button>
             `;
         } else {
             return `
                 <custom-button 
-                    id="buyButton"
                     text="หยิบใส่ตะกร้า"
-                    bg="blue-500"
-                    hoverBg="blue-600"
-                    color="white">
+                    color="white"
+                    bgColor="blue-600"
+                    hoverBg="blue-500"
+                    type="button"
+                    hoverText="white"
+                    class="w-full text-sm"
+                    icon="cart"
+                    onclick="this.closest('product-card').addToCart()">
                 </custom-button>
             `;
         }
