@@ -7,8 +7,12 @@ class CategoryList extends HTMLElement {
 
     async connectedCallback() {
         this.innerHTML = `
-            <div class="flex flex-wrap gap-2 p-4">
-                <button class="category-btn bg-blue-500 text-white px-4 py-2 rounded-lg" data-id="">All</button>
+            <div class="bg-white rounded-lg shadow-sm">
+                <div class="flex flex-col space-y-2">
+                    <button class="category-btn text-left px-4 py-2 rounded transition-colors duration-200 hover:bg-yellow-50 bg-yellow-100 text-yellow-700 font-medium" data-id="">
+                        ทั้งหมด
+                    </button>
+                </div>
             </div>
         `;
         await this.fetchCategories();
@@ -17,15 +21,15 @@ class CategoryList extends HTMLElement {
 
     async fetchCategories() {
         try {
-            const response = await fetch("/mali-clear-clinic/api/Category.php");
+            const response = await fetch("/mali-clear-clinic/api/category/Category.php");
             const data = await response.json();
             console.log("Fetched Categories:", data);
 
             if (data.status === "success") {
-                const container = this.querySelector("div");
+                const container = this.querySelector(".flex-col");
                 data.categories.forEach(category => {
                     const button = document.createElement("button");
-                    button.className = "category-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300";
+                    button.className = "category-btn text-left px-4 py-2 rounded transition-colors duration-200 hover:bg-yellow-50 text-gray-600";
                     button.textContent = category.name;
                     button.dataset.id = category.id;
                     container.appendChild(button);
@@ -54,11 +58,11 @@ class CategoryList extends HTMLElement {
     updateSelectedCategory() {
         this.querySelectorAll(".category-btn").forEach(btn => {
             if (btn.dataset.id === this.selectedCategory) {
-                btn.classList.add("bg-blue-500", "text-white");
-                btn.classList.remove("bg-gray-200", "text-gray-700");
+                btn.classList.remove('text-gray-600');
+                btn.classList.add('bg-yellow-100', 'text-yellow-700', 'font-medium');
             } else {
-                btn.classList.add("bg-gray-200", "text-gray-700");
-                btn.classList.remove("bg-blue-500", "text-white");
+                btn.classList.remove('bg-yellow-100', 'text-yellow-700', 'font-medium');
+                btn.classList.add('text-gray-600');
             }
         });
     }

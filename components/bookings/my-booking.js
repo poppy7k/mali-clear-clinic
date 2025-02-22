@@ -20,7 +20,7 @@ class MyBookings extends HTMLElement {
 
     async loadBookings() {
         try {
-            const response = await fetch(`/mali-clear-clinic/api/Booking.php?user_id=${this.userId}`);
+            const response = await fetch(`/mali-clear-clinic/api/booking/Booking.php?user_id=${this.userId}`);
             const bookings = await response.json();
             console.log(bookings);
             console.log(this.userId);

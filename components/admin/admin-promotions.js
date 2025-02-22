@@ -20,7 +20,7 @@ class AdminPromotions extends HTMLElement {
 
     async loadPromotions() {
         try {
-            const response = await fetch('/mali-clear-clinic/api/Promotion.php');
+            const response = await fetch('/mali-clear-clinic/api/promotion/Promotion.php');
             const result = await response.json();
             if (result.status === 'success') {
                 this.promotions = result.data;
@@ -33,7 +33,7 @@ class AdminPromotions extends HTMLElement {
     async deletePromotion(id) {
         if (confirm('คุณต้องการลบโปรโมชั่นนี้ใช่หรือไม่?')) {
             try {
-                const response = await fetch('/mali-clear-clinic/api/v1/Promotion.php', {
+                const response = await fetch('/mali-clear-clinic/api/promotion/Promotion.php', {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
@@ -60,7 +60,7 @@ class AdminPromotions extends HTMLElement {
         const formData = new FormData(event.target);
         
         try {
-            const response = await fetch('/mali-clear-clinic/api/Promotion.php', {
+            const response = await fetch('/mali-clear-clinic/api/promotion/Promotion.php', {
                 method: 'POST',
                 body: formData
             });

@@ -5,8 +5,8 @@ header("Content-Type: application/json");
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once(__DIR__ . '/../Models/Database.php');
-require_once(__DIR__ . '/../Models/Category.php');
+require_once(__DIR__ . '/../../Models/Database.php');
+require_once(__DIR__ . '/../../Models/Category.php');
 
 // สร้างการเชื่อมต่อกับฐานข้อมูล
 $database = new Database();

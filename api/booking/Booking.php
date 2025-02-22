@@ -1,7 +1,7 @@
 <?php
 header("Content-Type: application/json");
-require_once(__DIR__ . '/../Models/Database.php');
-require_once(__DIR__ . '/../Models/Booking.php');
+require_once(__DIR__ . '/../../Models/Database.php');
+require_once(__DIR__ . '/../../Models/Booking.php');
 
 $database = new Database();
 $db = $database->getConnection();

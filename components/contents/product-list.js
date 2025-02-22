@@ -1,54 +1,118 @@
 class ProductServiceList extends HTMLElement {
     constructor() {
         super();
-        this.selectedCategory = ""; // เก็บค่าหมวดหมู่ที่เลือก
+        this.selectedCategory = "";
+        this.selectedType = "all"; // เพิ่ม state สำหรับเก็บประเภทที่เลือก
     }
 
     async connectedCallback() {
         this.innerHTML = `
             <div class="container mx-auto py-2">
                 <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Our Products and Services</h2>
-                <div class="grid grid-cols-4">
-                    <category-list></category-list>
-                    <div id="productServiceList" class="grid col-span-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-4"></div>
+                
+                <div class="flex gap-6">
+                    <!-- Filters Section -->
+                    <div class="w-1/4 bg-white rounded-lg shadow-md p-4">
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-3 text-gray-800">ประเภท</h3>
+                            <div class="flex flex-col space-y-2">
+                                <button class="type-btn text-left px-4 py-2 rounded hover:bg-yellow-50 transition-colors ${this.selectedType === 'all' ? 'bg-yellow-100 text-yellow-700' : ''}" 
+                                        data-type="all">
+                                    🏷️ ทั้งหมด
+                                </button>
+                                <button class="type-btn text-left px-4 py-2 rounded hover:bg-yellow-50 transition-colors ${this.selectedType === 'SERVICE' ? 'bg-yellow-100 text-yellow-700' : ''}" 
+                                        data-type="SERVICE">
+                                    💆‍♀️ บริการ
+                                </button>
+                                <button class="type-btn text-left px-4 py-2 rounded hover:bg-yellow-50 transition-colors ${this.selectedType === 'PRODUCT' ? 'bg-yellow-100 text-yellow-700' : ''}" 
+                                        data-type="PRODUCT">
+                                    🛍️ สินค้า
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="border-t pt-4">
+                            <h3 class="text-lg font-semibold mb-3 text-gray-800">หมวดหมู่</h3>
+                            <category-list class="flex flex-col"></category-list>
+                        </div>
+                    </div>
+
+                    <!-- Products Grid -->
+                    <div class="w-3/4">
+                        <div id="productServiceList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
 
-        // ใช้ MutationObserver เพื่อรอให้ category-list โหลดเสร็จ
+        // เพิ่ม Event Listeners
+        this.setupEventListeners();
+        
+        // ใช้ MutationObserver สำหรับ category-list
+        this.setupCategoryObserver();
+
+        await this.fetchProducts();
+    }
+
+    setupEventListeners() {
+        const typeButtons = this.querySelectorAll('.type-btn');
+        typeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // อัปเดต UI ของปุ่ม
+                typeButtons.forEach(b => {
+                    b.classList.remove('bg-yellow-100', 'text-yellow-700');
+                });
+                btn.classList.add('bg-yellow-100', 'text-yellow-700');
+                
+                // อัปเดต state และโหลดข้อมูลใหม่
+                this.selectedType = btn.dataset.type;
+                this.fetchProducts();
+            });
+        });
+    }
+
+    setupCategoryObserver() {
         const observer = new MutationObserver(() => {
             this.filterList = this.querySelector("category-list");
             if (this.filterList) {
-                console.log("filterList found, setting callback");
                 this.filterList.setCategorySelectedCallback((categoryId) => {
-                    console.log("Category selected in ProductServiceList:", categoryId);
                     this.selectedCategory = categoryId;
+                    // เรียก fetchProducts โดยใช้ทั้ง selectedCategory และ selectedType
                     this.fetchProducts();
                 });
-                observer.disconnect(); // หยุดสังเกตเมื่อพบแล้ว
+                observer.disconnect();
             }
         });
         observer.observe(this, { childList: true, subtree: true });
-
-        await this.fetchProducts();  // ทำการดึงข้อมูลสินค้าครั้งแรก
     }
 
     async fetchProducts() {
-        console.log("Fetching products for category ID:", this.selectedCategory);
         try {
-            let url = "/mali-clear-clinic/api/Product.php";
+            let url = "/mali-clear-clinic/api/product/Product.php";
+            const params = new URLSearchParams();
+            
+            // ตรวจสอบและเพิ่มพารามิเตอร์ทั้ง category และ type
             if (this.selectedCategory) {
-                url += `?category_id=${this.selectedCategory}`;
+                params.append('category_id', this.selectedCategory);
             }
+            // แก้ไขเงื่อนไขการเพิ่ม type parameter
+            if (this.selectedType && this.selectedType !== 'all') {
+                params.append('type', this.selectedType);
+            }
+
+            if (params.toString()) {
+                url += `?${params.toString()}`;
+            }
+
+            console.log('Fetching URL:', url); // เพิ่ม log เพื่อตรวจสอบ URL
 
             const response = await fetch(url);
             const result = await response.json();
 
             if (result.status === "success") {
-                const products = result.data;
-                this.renderProducts(products);
+                this.renderProducts(result.data);
             } else {
-                console.error("Error: Invalid response status", result);
                 this.showNoProductsMessage();
             }
         } catch (error) {
@@ -57,44 +121,36 @@ class ProductServiceList extends HTMLElement {
         }
     }
 
+    renderProducts(products) {
+        const productList = this.querySelector('#productServiceList');
+        if (!products || products.length === 0) {
+            this.showNoProductsMessage();
+            return;
+        }
+
+        productList.innerHTML = products.map(product => {
+            const card = document.createElement('product-card');
+            card.data = product;
+            return card.outerHTML;
+        }).join('');
+
+        // อัปเดต data หลังจาก render
+        products.forEach(product => {
+            const card = this.querySelector(`product-card[id="product-${product.id}"]`);
+            if (card) {
+                card.data = product;
+            }
+        });
+    }
+
     showNoProductsMessage() {
-        const productList = this.querySelector("#productServiceList");
+        const productList = this.querySelector('#productServiceList');
         productList.innerHTML = `
-            <div class="text-center text-gray-600 text-lg col-span-3">
-                No products available at the moment.
+            <div class="col-span-full text-center text-gray-500 py-8">
+                ไม่พบสินค้าหรือบริการในหมวดหมู่ที่เลือก
             </div>
         `;
     }
-
-    renderProducts(products) {
-        const productList = this.querySelector("#productServiceList");
-        productList.innerHTML = ""; 
-
-        products.forEach(product => {
-            const productCard = document.createElement("div");
-            productCard.classList.add("bg-white", "p-6", "rounded-lg", "shadow-md");
-            productCard.innerHTML = `
-                <img src="${product.image}" alt="${product.name}" class="w-full h-40 object-cover rounded-md mb-4">
-                <h3 class="text-xl font-semibold text-gray-700">${product.name}</h3>
-                <p class="text-gray-600 mb-4">${product.description}</p>
-                <button class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none" data-id="${product.id}">
-                    Book Now
-                </button>
-            `;
-            const bookButton = productCard.querySelector("button");
-            bookButton.addEventListener("click", () => this.handleBookingClick(product));
-
-            productList.appendChild(productCard);
-        });
-
-        if (products.length === 0) {
-            this.showNoProductsMessage();
-        }
-    }
-
-    handleBookingClick(product) {
-        window.location.href = `/mali-clear-clinic/pages/booking.html?product_id=${product.id}&product_name=${encodeURIComponent(product.name)}`;
-    }
 }
 
-customElements.define("product-list", ProductServiceList);
+customElements.define('product-list', ProductServiceList);

@@ -3,19 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Services and Products</title>
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    <script type="module" src="../components/layouts/layout-navbar.js" defer></script>
-    <script type="module" src="../components/contents/product-list.js" defer></script>
-    <script type="module" src="../components/filters/category-list.js" defer></script>
+    <title>Our Services and Products - Mali Clear Clinic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <script src="../components/buttons/custom-button.js" defer></script>
+    <!-- Components -->
+    <script type="module" src="/mali-clear-clinic/components/layouts/layout-navbar.js" defer></script>
+    <script type="module" src="/mali-clear-clinic/components/products/product-card.js" defer></script>
+    <script type="module" src="/mali-clear-clinic/components/products/products.js" defer></script>
+    <script type="module" src="/mali-clear-clinic/components/filters/category-list.js" defer></script>
+    <script src="/mali-clear-clinic/components/buttons/custom-button.js" defer></script>
+    <script type="module" src="/mali-clear-clinic/components/contents/product-list.js" defer></script>
 </head>
 <body class="bg-gray-100">
     <layout-navbar></layout-navbar>
     
-    <div class="gap-20 my-20 mx-36">
-        <product-list class=""></product-list>
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex gap-6">
+
+            <!-- ส่วนของ Products List -->
+            <div class="w-full">
+                <product-list></product-list>
+            </div>
+        </div>
     </div>
 </body>
 </html>

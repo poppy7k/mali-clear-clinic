@@ -5,8 +5,8 @@ header("Content-Type: application/json");
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once (__DIR__ . '/../Models/Database.php');
-require_once (__DIR__ . '/../Models/Product.php');
+require_once (__DIR__ . '/../../Models/Database.php');
+require_once (__DIR__ . '/../../Models/Product.php');
 
 // สร้างการเชื่อมต่อกับฐานข้อมูล
 $database = new Database();
@@ -24,23 +24,25 @@ $product = new Product($db);
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
-    // ตรวจสอบว่ามีการส่ง category_id มาหรือไม่
+    $type = isset($_GET['type']) ? $_GET['type'] : null;
     $category_id = isset($_GET['category_id']) ? $_GET['category_id'] : null;
 
-    // ถ้ามี category_id ให้ดึงสินค้าตามหมวดหมู่
-    if ($category_id) {
+    // เพิ่มเงื่อนไขใหม่
+    if ($type && $category_id) {
+        $products = $product->getProductsByTypeAndCategory($type, $category_id);
+    } else if ($type) {
+        $products = $product->getProductsByType($type);
+    } else if ($category_id) {
         $products = $product->getProductsByCategory($category_id);
     } else {
         $products = $product->getAllProducts();
     }
 
-    // ตรวจสอบว่ามีข้อมูลหรือไม่
-    if (empty($products)) {
-        echo json_encode(["status" => "success", "data" => []]); // คืนค่าเป็นอาร์เรย์ว่างถ้าไม่มีสินค้า
+    if ($products === false) {
+        echo json_encode(["status" => "error", "message" => "Failed to fetch products"]);
         exit;
     }
 
-    // ส่งข้อมูลผลิตภัณฑ์ออกไป
     echo json_encode(["status" => "success", "data" => $products]);
     exit;
 }
@@ -50,8 +52,14 @@ if ($method === 'POST') {
     $data = json_decode(file_get_contents("php://input"), true);
 
     // ตรวจสอบข้อมูลที่จำเป็น
-    if (!isset($data['name'], $data['description'], $data['price'], $data['image'], $data['category_id'])) {
+    if (!isset($data['name'], $data['description'], $data['price'], $data['image'], $data['category_id'], $data['type'])) {
         echo json_encode(["status" => "error", "message" => "Missing required fields"]);
+        exit;
+    }
+
+    // ตรวจสอบว่า type ถูกต้อง
+    if (!in_array($data['type'], ['PRODUCT', 'SERVICE'])) {
+        echo json_encode(["status" => "error", "message" => "Invalid product type"]);
         exit;
     }
 
@@ -61,6 +69,7 @@ if ($method === 'POST') {
     $product->price = $data['price'];
     $product->image = $data['image'];
     $product->category_id = $data['category_id'];
+    $product->type = $data['type'];
 
     if ($product->create()) {
         echo json_encode(["status" => "success", "message" => "Product created successfully"]);
@@ -75,8 +84,14 @@ if ($method === 'PUT') {
     $data = json_decode(file_get_contents("php://input"), true);
 
     // ตรวจสอบข้อมูลที่จำเป็น
-    if (!isset($data['id'], $data['name'], $data['description'], $data['price'], $data['image'], $data['category_id'])) {
+    if (!isset($data['id'], $data['name'], $data['description'], $data['price'], $data['image'], $data['category_id'], $data['type'])) {
         echo json_encode(["status" => "error", "message" => "Missing required fields"]);
+        exit;
+    }
+
+    // ตรวจสอบว่า type ถูกต้อง
+    if (!in_array($data['type'], ['PRODUCT', 'SERVICE'])) {
+        echo json_encode(["status" => "error", "message" => "Invalid product type"]);
         exit;
     }
 
@@ -87,6 +102,7 @@ if ($method === 'PUT') {
     $product->price = $data['price'];
     $product->image = $data['image'];
     $product->category_id = $data['category_id'];
+    $product->type = $data['type'];
 
     if ($product->update()) {
         echo json_encode(["status" => "success", "message" => "Product updated successfully"]);
@@ -119,4 +135,4 @@ if ($method === 'DELETE') {
 
 echo json_encode(["status" => "error", "message" => "Invalid request method"]);
 exit;
-?>
+?> 

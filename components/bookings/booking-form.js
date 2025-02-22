@@ -46,7 +46,7 @@ class BookingForm extends HTMLElement {
 
     async submitBooking(bookingDate) {
         try {
-            const response = await fetch('/mali-clear-clinic/api/Booking.php', {
+            const response = await fetch('/mali-clear-clinic/api/booking/Booking.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

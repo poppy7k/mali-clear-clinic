@@ -10,7 +10,7 @@ class Promotions extends HTMLElement {
     async loadPromotions() {
         try {
             console.log('Loading promotions...');
-            const response = await fetch('/mali-clear-clinic/api/Promotion.php');
+            const response = await fetch('/mali-clear-clinic/api/promotion/Promotion.php');
             const result = await response.json();
             console.log('Promotions result:', result);
             

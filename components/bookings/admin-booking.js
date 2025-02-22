@@ -18,7 +18,7 @@ class AdminBooking extends HTMLElement {
 
     async loadBookings() {
         try {
-            const response = await fetch(`/mali-clear-clinic/api/Booking.php`);
+            const response = await fetch(`/mali-clear-clinic/api/booking/Booking.php`);
             const bookings = await response.json();
 
             const bookingList = this.querySelector("#booking-list");
@@ -72,7 +72,7 @@ class AdminBooking extends HTMLElement {
 
     async updateBookingStatus(bookingId, status) {
         try {
-            const response = await fetch(`/mali-clear-clinic/api/Booking.php`, {
+            const response = await fetch(`/mali-clear-clinic/api/booking/Booking.php`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: bookingId, status })
@@ -87,7 +87,7 @@ class AdminBooking extends HTMLElement {
 
     async deleteBooking(bookingId) {
         try {
-            const response = await fetch(`/mali-clear-clinic/api/Booking.php`, {
+            const response = await fetch(`/mali-clear-clinic/api/booking/Booking.php`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: bookingId })

@@ -118,7 +118,7 @@ class CustomNavbar extends HTMLElement {
                     <button id="profile-btn" class="py-2 px-2 rounded-[22px] transition-all duration-300 fill-gray-700 cursor-pointer hover:fill-yellow-400 hover:scale-125">
                         <svg class="h-5" xmlns="http://www.w3.org/2000/svg" id="Outline" viewBox="0 0 24 24"><path d="M12,12A6,6,0,1,0,6,6,6.006,6.006,0,0,0,12,12ZM12,2A4,4,0,1,1,8,6,4,4,0,0,1,12,2Z"/><path d="M12,14a9.01,9.01,0,0,0-9,9,1,1,0,0,0,2,0,7,7,0,0,1,14,0,1,1,0,0,0,2,0A9.01,9.01,0,0,0,12,14Z"/></svg>
                     </button>
-                    <div id="dropdown" class="absolute right-0 mt-2 w-48 bg-white border-1 border-gray-300 rounded-lg shadow-lg hidden divide-y-1 divide-gray-300 px-4 py-2">
+                    <div id="dropdown" class="absolute right-0 mt-2 w-52 bg-white border-1 border-gray-300 rounded-lg shadow-lg hidden px-4 py-2">
                         <div class="px-1 pt-1 pb-2">
                             @${user.username}
                         </div>
