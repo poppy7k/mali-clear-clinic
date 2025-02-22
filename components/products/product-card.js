@@ -10,7 +10,26 @@ class ProductCard extends HTMLElement {
 
     render() {
         this.innerHTML = `
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden relative">
+                <div class="absolute top-3 right-2.5 z-10">
+                    <span class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 ${
+                        this.product.type === 'SERVICE' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-blue-100 text-blue-800'
+                    }">
+                        ${this.product.type === 'SERVICE' 
+                            ? `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/>
+                                <path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586z"/>
+                               </svg>`
+                            : `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 7h-3V6c0-1.654-1.346-3-3-3h-2C9.346 3 8 4.346 8 6v1H5c-1.103 0-2 .897-2 2v9c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V9c0-1.103-.897-2-2-2zm-9-1c0-.551.449-1 1-1h2c.551 0 1 .449 1 1v1h-4V6zm9 11H5V9h14v8z"/>
+                               </svg>`
+                        }
+                        ${this.product.type === 'SERVICE' ? 'บริการ' : 'สินค้า'}
+                    </span>
+                </div>
+                
                 <img src="/mali-clear-clinic/assets/images/${this.product.image}" 
                      alt="${this.product.name}" 
                      class="w-full h-48 object-cover">
