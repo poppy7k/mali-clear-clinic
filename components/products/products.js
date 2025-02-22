@@ -1,3 +1,5 @@
+import { AppError, ErrorTypes, handleError } from '../../utils/ErrorHandler.js';
+
 class Products extends HTMLElement {
     constructor() {
         super();
@@ -12,32 +14,29 @@ class Products extends HTMLElement {
 
     async loadProducts() {
         try {
-            let url = '/mali-clear-clinic/api/product/Product.php';
-            if (this.activeTab !== 'all') {
-                url += `?type=${this.activeTab.toUpperCase()}`;
+            const response = await fetch('/mali-clear-clinic/api/product/Product.php');
+            if (!response.ok) {
+                throw new AppError('ไม่สามารถโหลดข้อมูลสินค้า', ErrorTypes.API_ERROR);
             }
-            
-            const response = await fetch(url);
-            const result = await response.json();
-            
-            if (result.status === 'success') {
-                this.products = result.data;
+            const data = await response.json();
+            if (data.status === 'success') {
+                this.products = data.data;
                 this.render();
             } else {
-                throw new Error(result.message || 'Failed to load products');
+                throw new AppError(data.message, ErrorTypes.API_ERROR);
             }
         } catch (error) {
-            console.error('Error loading products:', error);
-            this.showErrorMessage();
+            const errorMessage = handleError(error, 'Products');
+            this.showErrorMessage(errorMessage);
         }
     }
 
-    showErrorMessage() {
+    showErrorMessage(message) {
         const productList = this.querySelector('#productServiceList');
         if (productList) {
             productList.innerHTML = `
                 <div class="col-span-full text-center text-gray-500">
-                    ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง
+                    ${message}
                 </div>
             `;
         }

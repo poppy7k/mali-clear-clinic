@@ -26,8 +26,20 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method === 'GET') {
     $type = isset($_GET['type']) ? $_GET['type'] : null;
     $category_id = isset($_GET['category_id']) ? $_GET['category_id'] : null;
+    $product_id = isset($_GET['product_id']) ? $_GET['product_id'] : null;
 
-    // เพิ่มเงื่อนไขใหม่
+    // เพิ่มเงื่อนไขการดึงข้อมูลตาม product_id
+    if ($product_id) {
+        $product_data = $product->getProductById($product_id);
+        if ($product_data) {
+            echo json_encode(["status" => "success", "data" => $product_data]);
+        } else {
+            echo json_encode(["status" => "error", "message" => "Product not found"]);
+        }
+        exit;
+    }
+    
+    // เงื่อนไขอื่นๆ ที่มีอยู่เดิม
     if ($type && $category_id) {
         $products = $product->getProductsByTypeAndCategory($type, $category_id);
     } else if ($type) {

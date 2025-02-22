@@ -148,12 +148,23 @@ class Product {
     }
 
     // ดึงข้อมูลสินค้าตาม ID
-    public function getProductById($id) {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":id", $id);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+    public function getProductById($product_id) {
+        $query = "SELECT p.*, c.name as category_name 
+                  FROM " . $this->table_name . " p
+                  LEFT JOIN categories c ON p.category_id = c.id
+                  WHERE p.id = ?";
+        
+        try {
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$product_id]);
+            
+            if ($stmt->rowCount() > 0) {
+                return $stmt->fetch(PDO::FETCH_ASSOC);
+            }
+            return false;
+        } catch(PDOException $e) {
+            return false;
+        }
     }
 }
 ?>

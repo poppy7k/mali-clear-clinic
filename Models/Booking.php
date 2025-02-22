@@ -46,24 +46,17 @@ class Booking {
     }
 
     // ดึงข้อมูลการจองทั้งหมด
-    public function readAll() {
-        $sql = "SELECT b.id, b.product_id, p.name AS product_name, b.booking_date, b.status, b.user_id, u.username
+    public function getAll() {
+        $sql = "SELECT b.id, b.product_id, p.name AS product_name, 
+                b.booking_date, b.status, b.user_id, u.username
                 FROM bookings b
                 JOIN products p ON b.product_id = p.id
-                JOIN users u ON b.user_id = u.id";
+                JOIN users u ON b.user_id = u.id
+                ORDER BY b.booking_date DESC";
         
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
-    // ดึงข้อมูลการจองตาม ID
-    public function readById($id) {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     // อัปเดตสถานะการจอง
@@ -74,6 +67,21 @@ class Booking {
         $stmt->bindParam(':status', $status);
 
         return $stmt->execute();
+    }
+
+    public function getBookingsByUserId($userId) {
+        $sql = "SELECT b.id, b.product_id, p.name AS product_name, 
+                b.booking_date, b.status, b.user_id, u.username
+                FROM bookings b
+                JOIN products p ON b.product_id = p.id
+                JOIN users u ON b.user_id = u.id
+                WHERE b.user_id = :user_id
+                ORDER BY b.booking_date DESC";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':user_id', $userId);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 ?>

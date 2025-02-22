@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Services and Products - Mali Clear Clinic</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 
     <!-- Components -->
     <script type="module" src="/mali-clear-clinic/components/layouts/layout-navbar.js" defer></script>
@@ -14,10 +14,11 @@
     <script src="/mali-clear-clinic/components/buttons/custom-button.js" defer></script>
     <script type="module" src="/mali-clear-clinic/components/contents/product-list.js" defer></script>
     <script type="module" src="/mali-clear-clinic/components/cart/cart-modal.js" defer></script>
+    <script type="module" src="/mali-clear-clinic/components/toast/toast-container.js" defer></script>
 </head>
 <body class="bg-gray-100">
     <layout-navbar></layout-navbar>
-    
+    <toast-container></toast-container>
     <div class="container mx-auto px-4 py-8">
         <div class="flex gap-6">
 

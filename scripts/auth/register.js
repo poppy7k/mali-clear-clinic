@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const formData = new FormData(this);
 
         try {
-            const response = await fetch("/mali-clear-clinic/Services/Auth/RegisterService.php", {
+            const response = await fetch("/mali-clear-clinic/api/Auth/RegisterService.php", {
                 method: "POST",
                 body: formData
             });

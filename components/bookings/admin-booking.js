@@ -1,128 +1,165 @@
 import { getUserSession } from "/mali-clear-clinic/scripts/auth/userSession.js";
+import BookingService from '../../services/BookingService.js';
+import { handleError } from '../../utils/ErrorHandler.js';
 
 class AdminBooking extends HTMLElement {
     constructor() {
         super();
+        this.bookings = [];
     }
 
     async connectedCallback() {
-        const user = await getUserSession();
-        if (user.role !== 'ADMIN') {
-            window.location.href = "/mali-clear-clinic/index.html";
-            return;
+        try {
+            const user = await getUserSession();
+            if (!user || user.role !== 'ADMIN') {
+                window.location.href = "/mali-clear-clinic/index.html";
+                return;
+            }
+            
+            await this.initializeConfirmationModal();
+            
+            await this.loadBookings();
+            this.render();
+        } catch (error) {
+            this.showErrorMessage(handleError(error, 'AdminBooking'));
         }
-        
-        this.render();
-        this.loadBookings();
+    }
+
+    async initializeConfirmationModal() {
+        return new Promise((resolve) => {
+            this.confirmationModal = document.createElement('confirmation-modal');
+            document.body.appendChild(this.confirmationModal);
+            
+            if (this.confirmationModal.isConnected) {
+                resolve();
+            } else {
+                this.confirmationModal.addEventListener('connected', resolve, { once: true });
+            }
+        });
     }
 
     async loadBookings() {
         try {
-            const response = await fetch(`/mali-clear-clinic/api/booking/Booking.php`);
-            const bookings = await response.json();
-
-            const bookingList = this.querySelector("#booking-list");
-            bookingList.innerHTML = bookings.length > 0
-                ? bookings.map(booking => `
-                    <tr class="border-b border-gray-200 text-gray-700">
-                        <td class="p-3">${booking.id}</td>
-                        <td class="p-3">${booking.username}</td>
-                        <td class="p-3">${booking.product_name}</td>
-                        <td class="p-3">${booking.booking_date}</td>
-                        <td class="p-3">
-                            <select class="status-select border p-1" data-id="${booking.id}">
-                                <option value="Pending" ${booking.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                                <option value="Confirmed" ${booking.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
-                                <option value="Cancelled" ${booking.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
-                            </select>
-                        </td>
-                        <td class="p-3">
-                            <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded" data-id="${booking.id}">Delete</button>
-                        </td>
-                    </tr>
-                `).join("")
-                : "<tr><td colspan='6' class='p-4 text-center'>No bookings found.</td></tr>";
-
-            this.addEventListeners();
+            const result = await BookingService.getBookings();
+            this.bookings = result.bookings;
         } catch (error) {
-            console.error("Error loading bookings:", error);
+            this.showErrorMessage(handleError(error, 'AdminBooking'));
         }
     }
 
-    addEventListeners() {
-        // อัปเดตสถานะการจอง
-        this.querySelectorAll(".status-select").forEach(select => {
-            select.addEventListener("change", async (event) => {
-                const bookingId = event.target.dataset.id;
-                const newStatus = event.target.value;
-                await this.updateBookingStatus(bookingId, newStatus);
-            });
-        });
+    async handleDeleteBooking(bookingId) {
+        if (!this.confirmationModal?.open) {
+            console.error('Confirmation modal is not ready');
+            return;
+        }
 
-        // ลบการจอง
-        this.querySelectorAll(".delete-btn").forEach(button => {
-            button.addEventListener("click", async (event) => {
-                const bookingId = event.target.dataset.id;
-                if (confirm("Are you sure you want to delete this booking?")) {
-                    await this.deleteBooking(bookingId);
+        this.confirmationModal.open(
+            'ยืนยันการลบ',
+            'คุณต้องการลบการจองนี้ใช่หรือไม่?',
+            async () => {
+                try {
+                    await BookingService.deleteBooking(bookingId);
+                    await this.loadBookings();
+                    this.render();
+                    this.showSuccessMessage('ลบการจองสำเร็จ');
+                } catch (error) {
+                    this.showErrorMessage(handleError(error, 'AdminBooking'));
                 }
-            });
-        });
+            }
+        );
     }
 
-    async updateBookingStatus(bookingId, status) {
-        try {
-            const response = await fetch(`/mali-clear-clinic/api/booking/Booking.php`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: bookingId, status })
-            });
-            const result = await response.json();
-            alert(result.message);
-            this.loadBookings(); // โหลดใหม่หลังอัปเดต
-        } catch (error) {
-            console.error("Error updating booking status:", error);
-        }
+    showSuccessMessage(message) {
+        this.showMessage(message, 'success');
     }
 
-    async deleteBooking(bookingId) {
-        try {
-            const response = await fetch(`/mali-clear-clinic/api/booking/Booking.php`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: bookingId })
-            });
-            const result = await response.json();
-            alert(result.message);
-            this.loadBookings(); // โหลดใหม่หลังลบ
-        } catch (error) {
-            console.error("Error deleting booking:", error);
+    showErrorMessage(message) {
+        this.showMessage(message, 'error');
+    }
+
+    showMessage(message, type = 'error') {
+        let messageElement = this.querySelector('.message');
+        if (!messageElement) {
+            messageElement = document.createElement('div');
+            messageElement.className = 'message p-4 rounded-lg mb-4';
+            this.insertAdjacentElement('afterbegin', messageElement);
         }
+
+        const isSuccess = type === 'success';
+        messageElement.className = `message p-4 rounded-lg mb-4 ${
+            isSuccess ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+        }`;
+        messageElement.textContent = message;
     }
 
     render() {
+        if (!Array.isArray(this.bookings)) {
+            this.innerHTML = '<div class="p-4">ไม่พบข้อมูลการจอง</div>';
+            return;
+        }
+
         this.innerHTML = `
-            <div class="container mx-auto p-6">
-                <h2 class="text-2xl font-bold mb-4">Manage Bookings</h2>
-                <div class="overflow-x-auto bg-white border border-gray-200 shadow-md rounded-lg p-4">
-                    <table class="w-full border-collapse">
-                        <thead class="border-b border-gray-200">
-                            <tr class="text-gray-800 font-semibold">
-                                <th class="p-3 text-left">Booking ID</th>
-                                <th class="p-3 text-left">User</th>
-                                <th class="p-3 text-left">Product</th>
-                                <th class="p-3 text-left">Date</th>
-                                <th class="p-3 text-left">Status</th>
-                                <th class="p-3 text-left">Actions</th>
+            <div class="container mx-auto px-4 py-8">
+                <h2 class="text-2xl font-bold mb-6">จัดการการจอง</h2>
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้จอง</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">บริการ</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่จอง</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody id="booking-list">
-                            <tr><td colspan="6" class="p-4 text-center">Loading...</td></tr>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${this.bookings.map(booking => `
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">${booking.username}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">${booking.product_name}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">${new Date(booking.booking_date).toLocaleDateString('th-TH')}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                            booking.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 
+                                            booking.status === 'Confirmed' ? 'bg-green-100 text-green-800' : 
+                                            'bg-red-100 text-red-800'
+                                        }">
+                                            ${booking.status}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button 
+                                            class="text-red-600 hover:text-red-900 delete-btn"
+                                            data-booking-id="${booking.id}"
+                                        >
+                                            ลบ
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
                         </tbody>
                     </table>
                 </div>
             </div>
         `;
+
+        this.addDeleteButtonListeners();
+    }
+
+    addDeleteButtonListeners() {
+        const deleteButtons = this.querySelectorAll('.delete-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const bookingId = e.target.dataset.bookingId;
+                this.handleDeleteBooking(bookingId);
+            });
+        });
+    }
+
+    disconnectedCallback() {
+        if (this.confirmationModal?.isConnected) {
+            document.body.removeChild(this.confirmationModal);
+        }
     }
 }
 

@@ -1,3 +1,4 @@
+import { AppError, ErrorTypes, handleError } from '../../utils/ErrorHandler.js';
 import { getUserSession } from "/mali-clear-clinic/scripts/auth/userSession.js";
 
 class BookingForm extends HTMLElement {
@@ -27,7 +28,7 @@ class BookingForm extends HTMLElement {
         
         if (!this.productId) {
             alert('ไม่พบข้อมูลสินค้า');
-            window.location.href = '/mali-clear-clinic/pages/products.html';
+            window.location.href = '/mali-clear-clinic/pages/service.html';
             return;
         }
         
@@ -36,28 +37,29 @@ class BookingForm extends HTMLElement {
 
     async handleFormSubmit(event) {
         event.preventDefault();
-        const bookingDate = this.querySelector('#booking-date').value;
-        
-        if (!this.userId) {
-            alert('กรุณาเข้าสู่ระบบก่อนทำการจอง');
-            return;
-        }
+        try {
+            if (!this.userId) {
+                throw new AppError('กรุณาเข้าสู่ระบบก่อนทำการจอง', ErrorTypes.AUTH_ERROR);
+            }
 
-        // ตรวจสอบว่าวันที่จองเป็นวันในอนาคต
-        const selectedDate = new Date(bookingDate);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        if (selectedDate < today) {
-            alert('กรุณาเลือกวันที่ในอนาคต');
-            return;
-        }
+            const bookingDate = this.querySelector('#booking-date').value;
+            const selectedDate = new Date(bookingDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (selectedDate < today) {
+                throw new AppError('กรุณาเลือกวันที่ในอนาคต', ErrorTypes.VALIDATION_ERROR);
+            }
 
-        const response = await this.submitBooking(bookingDate);
-        if (response.status === 'success') {
-            this.showSuccessMessage();
-        } else {
-            this.showErrorMessage(response.message || 'เกิดข้อผิดพลาดในการจอง');
+            const response = await this.submitBooking(bookingDate);
+            if (response.status === 'success') {
+                this.showSuccessMessage();
+            } else {
+                throw new AppError(response.message, ErrorTypes.API_ERROR);
+            }
+        } catch (error) {
+            const errorMessage = handleError(error, 'BookingForm');
+            this.showErrorMessage(errorMessage);
         }
     }
 
@@ -65,19 +67,21 @@ class BookingForm extends HTMLElement {
         try {
             const response = await fetch('/mali-clear-clinic/api/booking/Booking.php', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     user_id: this.userId,
-                    product_id: this.productId, 
+                    product_id: this.productId,
                     booking_date: bookingDate,
                 }),
             });
+            
+            if (!response.ok) {
+                throw new AppError('การส่งข้อมูลล้มเหลว', ErrorTypes.API_ERROR);
+            }
+            
             return await response.json();
         } catch (error) {
-            console.error('Error submitting booking:', error);
-            return { status: 'error' };
+            throw new AppError('ไม่สามารถทำการจองได้', ErrorTypes.NETWORK_ERROR, error);
         }
     }
 

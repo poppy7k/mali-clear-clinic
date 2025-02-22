@@ -6,12 +6,14 @@
     <title>Registration Form</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <script type="module" src="../components/layouts/layout-navbar.js" defer></script>
-    <script src="../scripts/auth/register.js" defer></script>
+    <script type="module" src="../scripts/auth/register.js" defer></script>
 
     <script src="../components/buttons/custom-button.js" defer></script>
     <script src="../components/form/form-input.js" defer></script>
+    <script type="module" src="../components/toast/toast-container.js" defer></script>
 </head>
 <body class="bg-gray-100">
+    <toast-container></toast-container>
     <layout-navbar></layout-navbar>
     <div class="flex items-center justify-center my-20">
         <div class="bg-white p-8 rounded-lg shadow-md w-full sm:w-96">

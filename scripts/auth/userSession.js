@@ -1,6 +1,6 @@
 export async function getUserSession() {
     try {
-        const response = await fetch('/mali-clear-clinic/Services/Auth/UserSession.php', {
+        const response = await fetch('/mali-clear-clinic/api/Auth/UserSession.php', {
             credentials: 'include'
         });
         const data = await response.json();
@@ -19,7 +19,7 @@ export async function getUserSession() {
 
 export async function logout() {
     try {
-        const response = await fetch('/mali-clear-clinic/Services/Auth/LogoutService.php', {
+        const response = await fetch('/mali-clear-clinic/api/Auth/LogoutService.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         });

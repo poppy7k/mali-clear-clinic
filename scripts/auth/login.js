@@ -1,41 +1,34 @@
+import { AppError, ErrorTypes, handleError } from '../../utils/ErrorHandler.js';
+
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("loginForm").addEventListener("submit", async function(event) {
-        event.preventDefault(); // ป้องกันการส่งฟอร์มแบบปกติ
+    const loginForm = document.getElementById("loginForm");
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message hidden';
+    loginForm.appendChild(errorDiv);
 
-        const formData = new FormData(this);
-
+    loginForm.addEventListener("submit", async function(event) {
+        event.preventDefault();
         try {
-            const response = await fetch("/mali-clear-clinic/Services/Auth/LoginService.php", {
+            const formData = new FormData(this);
+            const response = await fetch("/mali-clear-clinic/api/Auth/LoginService.php", {
                 method: "POST",
                 body: formData
             });
 
-            // ตรวจสอบรหัสสถานะของการตอบกลับ
             if (!response.ok) {
-                console.error(`Server error: ${response.status}`);
-                alert(`Server error: ${response.status}`);
-                return;
+                throw new AppError(`Server error: ${response.status}`, ErrorTypes.API_ERROR);
             }
 
-            // ดึงข้อมูลที่ส่งกลับจากเซิร์ฟเวอร์เป็นข้อความ
-            const textResponse = await response.text();
-            console.log("Response from server:", textResponse); // ตรวจสอบเนื้อหาที่ตอบกลับจากเซิร์ฟเวอร์
-
-            // ลองแปลงเป็น JSON
-            try {
-                const result = JSON.parse(textResponse); // แปลงข้อความเป็น JSON
-                if (result.status === "success") {
-                    alert(result.message); // แจ้งผลสำเร็จ
-                    window.location.href = "service.html"; // เปลี่ยนไปที่หน้า dashboard หรือหน้าอื่นๆ
-                } else {
-                    alert(result.message); // แจ้งข้อผิดพลาด เช่น อีเมลหรือรหัสผิด
-                }
-            } catch (e) {
-                console.error("Failed to parse JSON:", e);
+            const result = await response.json();
+            if (result.status === "success") {
+                window.location.href = "service.html";
+            } else {
+                throw new AppError(result.message, ErrorTypes.AUTH_ERROR);
             }
         } catch (error) {
-            console.error("Error:", error);
-            alert("Server error, please try again.");
+            const errorMessage = handleError(error, 'LoginForm');
+            errorDiv.textContent = errorMessage;
+            errorDiv.classList.remove('hidden');
         }
     });
 });

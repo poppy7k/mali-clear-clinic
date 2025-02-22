@@ -98,6 +98,10 @@ class ProductCard extends HTMLElement {
 
     async handleBooking() {
         const user = await getUserSession();
+        if (!this.product.id) {
+            console.error('Product data is not set.');
+            return;
+        }
         if (!user) {
             window.location.href = '/mali-clear-clinic/pages/login.html';
             return;
@@ -117,11 +121,7 @@ class ProductCard extends HTMLElement {
             return;
         }
 
-        const params = new URLSearchParams({
-            id: this.product.id,
-            type: this.product.type
-        });
-        window.location.href = `/mali-clear-clinic/pages/purchase.html?${params.toString()}`;
+        window.location.href = `/mali-clear-clinic/pages/purchase.html?product_id=${this.product.id}`;
     }
 }
 
