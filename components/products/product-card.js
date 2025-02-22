@@ -1,3 +1,5 @@
+import { getUserSession } from '/mali-clear-clinic/scripts/auth/userSession.js';
+
 class ProductCard extends HTMLElement {
     constructor() {
         super();
@@ -48,10 +50,12 @@ class ProductCard extends HTMLElement {
     }
 
     renderActionButton() {
+        if (!this.product) return '';
+
         if (this.product.type === 'SERVICE') {
             return `
                 <custom-button 
-                    text="จองคิว"
+                    text="จองบริการ"
                     color="white"
                     bgColor="green-600"
                     hoverBg="green-500"
@@ -59,13 +63,13 @@ class ProductCard extends HTMLElement {
                     hoverText="white"
                     class="w-full text-sm"
                     icon="calendar"
-                    onclick="window.location.href='/mali-clear-clinic/pages/booking.html'">
+                    onclick="this.closest('product-card').handleBooking()">
                 </custom-button>
             `;
         } else {
             return `
                 <custom-button 
-                    text="หยิบใส่ตะกร้า"
+                    text="สั่งซื้อ"
                     color="white"
                     bgColor="blue-600"
                     hoverBg="blue-500"
@@ -73,7 +77,7 @@ class ProductCard extends HTMLElement {
                     hoverText="white"
                     class="w-full text-sm"
                     icon="cart"
-                    onclick="this.closest('product-card').addToCart()">
+                    onclick="this.closest('product-card').handlePurchase()">
                 </custom-button>
             `;
         }
@@ -88,7 +92,7 @@ class ProductCard extends HTMLElement {
         }
 
         if (buyButton) {
-            buyButton.addEventListener('click', () => this.handleAddToCart());
+            buyButton.addEventListener('click', () => this.handlePurchase());
         }
     }
 
@@ -98,38 +102,26 @@ class ProductCard extends HTMLElement {
             window.location.href = '/mali-clear-clinic/pages/login.html';
             return;
         }
-        window.location.href = `/mali-clear-clinic/pages/booking.html?service=${this.product.id}`;
+        window.location.href = `/mali-clear-clinic/pages/booking.html?product_id=${this.product.id}&product_name=${this.product.name}`;
     }
 
-    async handleAddToCart() {
+    async handlePurchase() {
+        if (!this.product) {
+            console.error('Product data is not set.');
+            return;
+        }
+
         const user = await getUserSession();
         if (!user) {
             window.location.href = '/mali-clear-clinic/pages/login.html';
             return;
         }
 
-        try {
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const existingItem = cart.find(item => item.id === this.product.id);
-
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cart.push({
-                    id: this.product.id,
-                    name: this.product.name,
-                    price: this.product.price,
-                    image: this.product.image,
-                    quantity: 1
-                });
-            }
-
-            localStorage.setItem('cart', JSON.stringify(cart));
-            alert('เพิ่มสินค้าลงตะกร้าแล้ว');
-        } catch (error) {
-            console.error('Error adding to cart:', error);
-            alert('ไม่สามารถเพิ่มสินค้าลงตะกร้าได้');
-        }
+        const params = new URLSearchParams({
+            id: this.product.id,
+            type: this.product.type
+        });
+        window.location.href = `/mali-clear-clinic/pages/purchase.html?${params.toString()}`;
     }
 }
 

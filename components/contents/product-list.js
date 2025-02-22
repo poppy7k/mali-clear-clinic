@@ -90,7 +90,6 @@ class ProductServiceList extends HTMLElement {
             if (this.filterList) {
                 this.filterList.setCategorySelectedCallback((categoryId) => {
                     this.selectedCategory = categoryId;
-                    // เรียก fetchProducts โดยใช้ทั้ง selectedCategory และ selectedType
                     this.fetchProducts();
                 });
                 observer.disconnect();
@@ -104,11 +103,9 @@ class ProductServiceList extends HTMLElement {
             let url = "/mali-clear-clinic/api/product/Product.php";
             const params = new URLSearchParams();
             
-            // ตรวจสอบและเพิ่มพารามิเตอร์ทั้ง category และ type
             if (this.selectedCategory) {
                 params.append('category_id', this.selectedCategory);
             }
-            // แก้ไขเงื่อนไขการเพิ่ม type parameter
             if (this.selectedType && this.selectedType !== 'all') {
                 params.append('type', this.selectedType);
             }
@@ -117,13 +114,13 @@ class ProductServiceList extends HTMLElement {
                 url += `?${params.toString()}`;
             }
 
-            console.log('Fetching URL:', url); // เพิ่ม log เพื่อตรวจสอบ URL
-
             const response = await fetch(url);
             const result = await response.json();
 
             if (result.status === "success") {
-                this.renderProducts(result.data);
+                this.products = result.data;
+                this.renderProducts();
+                this.assignProductData();
             } else {
                 this.showNoProductsMessage();
             }
@@ -133,24 +130,25 @@ class ProductServiceList extends HTMLElement {
         }
     }
 
-    renderProducts(products) {
+    renderProducts() {
         const productList = this.querySelector('#productServiceList');
-        if (!products || products.length === 0) {
+        if (!this.products || this.products.length === 0) {
             this.showNoProductsMessage();
             return;
         }
 
-        productList.innerHTML = products.map(product => {
+        productList.innerHTML = this.products.map(product => {
             const card = document.createElement('product-card');
             card.data = product;
             return card.outerHTML;
         }).join('');
+    }
 
-        // อัปเดต data หลังจาก render
-        products.forEach(product => {
-            const card = this.querySelector(`product-card[id="product-${product.id}"]`);
-            if (card) {
-                card.data = product;
+    assignProductData() {
+        const cards = this.querySelectorAll('product-card');
+        cards.forEach((card, index) => {
+            if (this.products[index]) {
+                card.data = this.products[index]; // กำหนดข้อมูล product
             }
         });
     }

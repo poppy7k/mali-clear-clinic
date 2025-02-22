@@ -22,17 +22,34 @@ class BookingForm extends HTMLElement {
 
     getProductDetailsFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);
-        this.productId = urlParams.get('product_id');  // กำหนดค่า productId
+        this.productId = urlParams.get('product_id');
         const productName = urlParams.get('product_name');
-        this.querySelector('#product-name').textContent = productName; // ใช้ querySelector ในการเข้าถึงใน DOM หลัก
+        
+        if (!this.productId) {
+            alert('ไม่พบข้อมูลสินค้า');
+            window.location.href = '/mali-clear-clinic/pages/products.html';
+            return;
+        }
+        
+        this.querySelector('#product-name').textContent = productName;
     }
 
     async handleFormSubmit(event) {
         event.preventDefault();
         const bookingDate = this.querySelector('#booking-date').value;
-
+        
         if (!this.userId) {
-            alert('You must be logged in to book a product.');
+            alert('กรุณาเข้าสู่ระบบก่อนทำการจอง');
+            return;
+        }
+
+        // ตรวจสอบว่าวันที่จองเป็นวันในอนาคต
+        const selectedDate = new Date(bookingDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (selectedDate < today) {
+            alert('กรุณาเลือกวันที่ในอนาคต');
             return;
         }
 
@@ -40,7 +57,7 @@ class BookingForm extends HTMLElement {
         if (response.status === 'success') {
             this.showSuccessMessage();
         } else {
-            this.showErrorMessage();
+            this.showErrorMessage(response.message || 'เกิดข้อผิดพลาดในการจอง');
         }
     }
 
@@ -69,8 +86,10 @@ class BookingForm extends HTMLElement {
         this.querySelector('#success-message').classList.remove('hidden');
     }
 
-    showErrorMessage() {
-        this.querySelector('#error-message').classList.remove('hidden');
+    showErrorMessage(message = 'เกิดข้อผิดพลาดในการจอง กรุณาลองใหม่อีกครั้ง') {
+        const errorElement = this.querySelector('#error-message');
+        errorElement.textContent = message;
+        errorElement.classList.remove('hidden');
         this.querySelector('#success-message').classList.add('hidden');
     }
 }
