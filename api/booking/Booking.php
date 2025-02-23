@@ -12,16 +12,20 @@ try {
 
     if ($method === 'POST') {
         $data = json_decode(file_get_contents("php://input"), true);
-        if (!isset($data['user_id'], $data['product_id'], $data['booking_date'])) {
+        if (!isset($data['user_id'], $data['product_id'], $data['full_name'], 
+                    $data['phone'], $data['address'], $data['booking_date'])) {
             echo json_encode(["status" => "error", "message" => "Missing required fields"]);
             exit;
         }
-
+    
         $booking->user_id = $data['user_id'];
         $booking->product_id = $data['product_id'];
+        $booking->full_name = $data['full_name'];
+        $booking->phone = $data['phone'];
+        $booking->address = $data['address'];
         $booking->booking_date = $data['booking_date'];
         $booking->status = 'Pending';
-
+    
         if ($booking->create()) {
             echo json_encode(["status" => "success", "message" => "Booking successful!"]);
         } else {
@@ -29,6 +33,7 @@ try {
         }
         exit;
     }
+    
 
     if ($method === 'GET') {
         $user_id = isset($_GET['user_id']) ? $_GET['user_id'] : null;

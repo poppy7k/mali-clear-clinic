@@ -136,10 +136,10 @@ class ToastContainer extends HTMLElement {
     
         // กำหนด path ของไอคอนที่เป็นไฟล์ HTML
         const iconPaths = {
-            success: "assets/icons/success.html",
-            danger: "assets/icons/error.html",
-            info: "assets/icons/info.html",
-            warning: "assets/icons/triangle-warning.html"
+            success: "/mali-clear-clinic/assets/icons/success.html",
+            danger: "/mali-clear-clinic/assets/icons/error.html",
+            info: "/mali-clear-clinic/assets/icons/info.html",
+            warning: "/mali-clear-clinic/assets/icons/triangle-warning.html"
         };
     
         // กำหนด background color ตามประเภทของ Toast
@@ -150,7 +150,7 @@ class ToastContainer extends HTMLElement {
             warning: "bg-yellow-600"
         };
     
-        const iconPath = iconPaths[type] || "assets/icons/default.html"; // ใช้ default ถ้าไม่ตรงเงื่อนไข
+        const iconPath = iconPaths[type] || "/mali-clear-clinic/assets/icons/default.html"; // ใช้ default ถ้าไม่ตรงเงื่อนไข
         iconWrapper.classList.add(bgColors[type] || "bg-gray-600"); // ✅ เพิ่ม background color
     
         try {

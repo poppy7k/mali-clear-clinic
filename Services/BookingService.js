@@ -4,13 +4,14 @@ import { AppError, ErrorTypes } from '../utils/ErrorHandler.js';
 class BookingService {
     static async createBooking(bookingData) {
         try {
-            if (!bookingData.user_id || !bookingData.product_id || !bookingData.booking_date) {
+            if (!bookingData.user_id || !bookingData.product_id || !bookingData.full_name ||
+                !bookingData.phone || !bookingData.address || !bookingData.booking_date) {
                 throw new AppError(
                     'กรุณากรอกข้อมูลการจองให้ครบถ้วน',
                     ErrorTypes.VALIDATION_ERROR
                 );
             }
-
+    
             const response = await ApiClient.post('/booking/Booking.php', bookingData);
             
             if (!response || response.status !== 'success') {
@@ -19,7 +20,7 @@ class BookingService {
                     ErrorTypes.API_ERROR
                 );
             }
-
+    
             return response;
         } catch (error) {
             if (error instanceof AppError) {
@@ -31,7 +32,7 @@ class BookingService {
                 error
             );
         }
-    }
+    }    
 
     static async getBookings() {
         try {

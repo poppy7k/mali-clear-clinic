@@ -11,18 +11,25 @@ class Booking {
     public $product_id;
     public $booking_date;
     public $status;
+    public $full_name;
+    public $phone;
+    public $address;
     public $created_at;
 
     public static $schema = [
         "id" => "INT AUTO_INCREMENT PRIMARY KEY",
         "user_id" => "INT NOT NULL",
         "product_id" => "INT NOT NULL",
-        "booking_date" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "full_name" => "VARCHAR(255) NOT NULL",
+        "phone" => "VARCHAR(20) NOT NULL",
+        "address" => "TEXT NOT NULL",
+        "booking_date" => "DATETIME NOT NULL",
         "status" => "VARCHAR(50) DEFAULT 'Pending'",
         "created_at" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
         "CONSTRAINT fk_bookings_user_id" => "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE",
         "CONSTRAINT fk_bookings_product_id" => "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE"
     ];
+    
 
     public function __construct($db) {
         $this->conn = $db;
@@ -34,15 +41,24 @@ class Booking {
 
     // ✅ เพิ่มการจองใหม่
     public function create() {
-        $query = "INSERT INTO " . $this->table_name . " (user_id, product_id, status) VALUES (:user_id, :product_id, :status)";
+        $query = "INSERT INTO " . $this->table_name . " 
+                  (user_id, product_id, full_name, phone, address, booking_date, status) 
+                  VALUES 
+                  (:user_id, :product_id, :full_name, :phone, :address, :booking_date, :status)";
+        
         $stmt = $this->conn->prepare($query);
-
+    
         $stmt->bindParam(':user_id', $this->user_id);
         $stmt->bindParam(':product_id', $this->product_id);
+        $stmt->bindParam(':full_name', $this->full_name);
+        $stmt->bindParam(':phone', $this->phone);
+        $stmt->bindParam(':address', $this->address);
+        $stmt->bindParam(':booking_date', $this->booking_date);
         $stmt->bindParam(':status', $this->status);
-
+    
         return $stmt->execute();
     }
+    
 
     // ✅ ดึงข้อมูลการจองทั้งหมด
     public function getAll() {
