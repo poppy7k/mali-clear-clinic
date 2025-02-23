@@ -17,6 +17,29 @@ export async function getUserSession() {
     }
 }
 
+export async function updateUserProfile(profileData) {
+    try {
+        const response = await fetch('/mali-clear-clinic/api/Auth/UpdateProfile.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(profileData),
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+        if (data.status !== 'success') {
+            throw new Error(data.message || 'ไม่สามารถอัพเดทข้อมูลได้');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        throw error;
+    }
+}
+
 export async function logout() {
     try {
         const response = await fetch('/mali-clear-clinic/api/Auth/LogoutService.php', {

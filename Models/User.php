@@ -24,13 +24,12 @@ class User {
         "phone" => "VARCHAR(15) DEFAULT NULL",
         "address" => "TEXT DEFAULT NULL",
         "role" => "ENUM('USER', 'ADMIN') DEFAULT 'USER'",
-        "created_at" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        "created_at" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "updated_at" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
     ];
 
     public function __construct($db) {
         $this->conn = $db;
-
-        // ✅ ตรวจสอบและอัปเดตโครงสร้างตาราง
         $tableManager = new TableManager($this->conn);
         $tableManager->validateAndUpdateTableStructure($this->table_name, self::$schema);
     }
@@ -87,6 +86,61 @@ class User {
             }
         }
         return false; 
+    }
+
+    public function updateProfile() {
+        try {
+            $query = "UPDATE " . $this->table_name . "
+                     SET full_name = :full_name,
+                         phone = :phone,
+                         updated_at = CURRENT_TIMESTAMP
+                     WHERE id = :id";
+
+            $stmt = $this->conn->prepare($query);
+
+            // ทำความสะอาดข้อมูล
+            $this->full_name = htmlspecialchars(strip_tags(trim($this->full_name)));
+            $this->phone = $this->phone ? htmlspecialchars(strip_tags(trim($this->phone))) : null;
+
+            // bind parameters
+            $stmt->bindParam(":full_name", $this->full_name);
+            $stmt->bindParam(":phone", $this->phone);
+            $stmt->bindParam(":id", $this->id);
+
+            if ($stmt->execute()) {
+                return true;
+            }
+            return false;
+        } catch(PDOException $e) {
+            error_log("Error updating user profile: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getById($id) {
+        try {
+            $query = "SELECT id, username, email, full_name, phone, address, role, created_at, updated_at 
+                     FROM " . $this->table_name . " 
+                     WHERE id = :id";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(":id", $id);
+            $stmt->execute();
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($result) {
+                // แปลงค่า null เป็นสตริงว่าง
+                $result['full_name'] = $result['full_name'] ?? '';
+                $result['phone'] = $result['phone'] ?? '';
+                $result['address'] = $result['address'] ?? '';
+            }
+
+            return $result;
+        } catch(PDOException $e) {
+            error_log("Error getting user by ID: " . $e->getMessage());
+            return false;
+        }
     }
 }
 ?>
