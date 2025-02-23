@@ -6,31 +6,80 @@ class ToastContainer extends HTMLElement {
     }
 
     connectedCallback() {
-        this.classList.add("fixed", "bottom-6", "right-6", "z-50", "space-y-4");
+        // เพิ่มคลาสเบื้องต้นด้วยการ split แล้วใช้ ...
+        this.classList.add(
+            ...["fixed", "bottom-6", "right-6", "z-50", "space-y-4"]
+        );
     }
 
     renderToasts(toasts) {
-        this.innerHTML = ""; // ล้าง Toast เก่าออกก่อน
+        // เคลียร์เนื้อหาทั้งหมดก่อน
+        this.innerHTML = "";
 
         toasts.forEach((toast) => {
+            // สร้าง div หลักของ Toast
             const toastElement = document.createElement("div");
-            toastElement.className =
-                "flex items-center justify-between rounded-2xl px-4 py-3 bg-white shadow-lg transform transition-all duration-500 ease-out border-2";
-            toastElement.classList.add(this.getToastStyle(toast.type));
 
+            // เพิ่มคลาสหลัก
+            toastElement.classList.add(
+                ...[
+                    "flex",
+                    "items-center",
+                    "justify-between",
+                    "rounded-2xl",
+                    "px-4",
+                    "py-3",
+                    "bg-white",
+                    "shadow-lg",
+                    "transform",
+                    "transition-all",
+                    "duration-500",
+                    "ease-out",
+                    "border-2"
+                ]
+            );
+
+            // เพิ่มคลาสจากฟังก์ชัน getToastStyle() โดย split เป็นอาเรย์
+            const styleClasses = this.getToastStyle(toast.type).split(" ");
+            toastElement.classList.add(...styleClasses);
+
+            // สร้าง Icon
+            const iconElement = this.getToastIconElement(toast.type);
+
+            // สร้าง Title
+            const titleElement = document.createElement("h3");
+            titleElement.classList.add("font-bold", "max-w-52", "truncate");
+            titleElement.textContent = toast.title;
+
+            // สร้างข้อความ
             const messageElement = document.createElement("p");
-            messageElement.className = "max-w-52";
+            messageElement.classList.add("max-w-52");
             messageElement.textContent = toast.message;
 
-            const toastContent = document.createElement("div");
-            toastContent.className = "ml-4";
-            toastContent.appendChild(titleElement);
-            toastContent.appendChild(messageElement);
+            // จัดกลุ่ม (icon + text)
+            const textContainer = document.createElement("div");
+            textContainer.classList.add("flex", "items-start");
 
-            // ปุ่มปิด Toast
+            const toastDetails = document.createElement("div");
+            toastDetails.classList.add("ml-4");
+
+            toastDetails.appendChild(titleElement);
+            toastDetails.appendChild(messageElement);
+
+            textContainer.appendChild(iconElement);
+            textContainer.appendChild(toastDetails);
+
+            // ปุ่มปิด
             const closeButton = document.createElement("button");
-            closeButton.className = "ml-4 text-xs cursor-pointer";
-            closeButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+            closeButton.classList.add("ml-4", "text-xs", "cursor-pointer");
+            closeButton.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" 
+                     class="h-6 w-6" fill="none" stroke="currentColor" 
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6 6 18"/>
+                    <path d="m6 6 12 12"/>
+                </svg>
+            `;
             closeButton.addEventListener("click", () => {
                 toastElement.style.opacity = "0";
                 toastElement.style.transform = "translateX(100px) scale(0.9)";
@@ -39,20 +88,39 @@ class ToastContainer extends HTMLElement {
                 }, 300);
             });
 
+            // ใส่ส่วนประกอบทั้งหมดลงใน toastElement
+            toastElement.appendChild(textContainer);
             toastElement.appendChild(closeButton);
+
+            // ใส่ Toast ที่สร้างเสร็จลงใน <toast-container>
             this.appendChild(toastElement);
+
+            // Animation เปิด Toast
+            toastElement.style.opacity = "0";
+            toastElement.style.transform = "translateY(20px) scale(0.9)";
+            setTimeout(() => {
+                toastElement.style.opacity = "1";
+                toastElement.style.transform = "translateY(0) scale(1)";
+            }, 100);
         });
     }
 
+    /**
+     * รับประเภท Toast แล้วคืนเป็นสตริงที่มีคลาส Tailwind
+     * NOTE: เราจะ split() ภายหลังแล้วใช้ spread เพิ่มใน classList
+     */
     getToastStyle(type) {
         return {
             success: "text-black border-green-500",
-            danger: "text-black border-red-500",
-            info: "text-black border-blue-500",
+            danger:  "text-black border-red-500",
+            info:    "text-black border-blue-500",
             warning: "text-black border-yellow-500",
         }[type] || "text-black border-gray-500";
     }
 
+    /**
+     * สร้าง Element ของ Icon ตาม type
+     */
     getToastIconElement(type) {
         const iconWrapper = document.createElement("div");
         iconWrapper.classList.add("rounded-full", "px-2", "py-2");
@@ -89,7 +157,6 @@ class ToastContainer extends HTMLElement {
 
         svg.appendChild(path);
         iconWrapper.appendChild(svg);
-
         return iconWrapper;
     }
 }
