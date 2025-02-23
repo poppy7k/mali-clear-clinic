@@ -1,5 +1,6 @@
 import { getUserSession } from '../../scripts/auth/userSession.js';
 import { toastManager } from '../../scripts/utils/toast.js';
+import { BlogService } from '../../Services/BlogService.js';
 
 class AdminBlogManager extends HTMLElement {
     constructor() {
@@ -19,7 +20,7 @@ class AdminBlogManager extends HTMLElement {
             await this.initializeConfirmationModal();
             this.render();
             this.setupEventListeners();
-            this.loadBlogs();
+            await this.loadBlogs();
             this.confirmationModal = this.querySelector('confirmation-modal');
         } catch (error) {
             console.error('Error:', error);
@@ -85,27 +86,7 @@ class AdminBlogManager extends HTMLElement {
 
     async loadBlogs() {
         try {
-            // TODO: เรียก API เพื่อดึงข้อมูลบล็อก
-            const mockBlogs = [
-                {
-                    id: 1,
-                    title: "วิธีดูแลผิวหน้าให้ใส",
-                    image: "blog1.jpg",
-                    excerpt: "เคล็ดลับการดูแลผิวหน้าให้ใสอย่างเป็นธรรมชาติ",
-                    createdAt: "2024-03-15",
-                    status: "published"
-                },
-                {
-                    id: 2,
-                    title: "ทำความรู้จักกับ Treatment ยอดนิยม",
-                    image: "blog2.jpg",
-                    excerpt: "รวม Treatment ที่ได้รับความนิยมในปี 2024",
-                    createdAt: "2024-03-14",
-                    status: "draft"
-                }
-            ];
-            
-            this.blogs = mockBlogs;
+            this.blogs = await BlogService.getAllBlogs();
             this.renderBlogsTable();
         } catch (error) {
             console.error('Error loading blogs:', error);
@@ -128,7 +109,7 @@ class AdminBlogManager extends HTMLElement {
                         <div class="font-medium">${blog.title}</div>
                         <div class="text-sm text-gray-500">${blog.excerpt}</div>
                     </td>
-                    <td class="p-3">${new Date(blog.createdAt).toLocaleDateString('th-TH')}</td>
+                    <td class="p-3">${new Date(blog.created_at).toLocaleDateString('th-TH')}</td>
                     <td class="p-3">
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             blog.status === 'published' 
@@ -171,10 +152,9 @@ class AdminBlogManager extends HTMLElement {
             `คุณต้องการลบบล็อก "${blogToDelete.title}" ใช่หรือไม่?`,
             async () => {
                 try {
-                    // TODO: เรียก API เพื่อลบข้อมูล
-                    console.log('Deleting blog:', id);
+                    await BlogService.deleteBlog(id);
                     toastManager.addToast('success', 'สำเร็จ', 'ลบข้อมูลเรียบร้อยแล้ว');
-                    this.loadBlogs();
+                    await this.loadBlogs();
                 } catch (error) {
                     console.error('Error deleting blog:', error);
                     toastManager.addToast('error', 'ข้อผิดพลาด', 'ไม่สามารถลบข้อมูลได้');
