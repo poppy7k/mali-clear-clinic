@@ -38,12 +38,11 @@ class Blog {
         $stmt = $this->conn->prepare($query);
 
         // ทำความสะอาดข้อมูล
-        $this->title = htmlspecialchars(strip_tags($this->title));
-        $this->content = htmlspecialchars(strip_tags($this->content));
-        $this->excerpt = htmlspecialchars(strip_tags($this->excerpt));
-        $this->image = htmlspecialchars(strip_tags($this->image));
-        $this->status = htmlspecialchars(strip_tags($this->status));
-
+        $this->title = htmlspecialchars(strip_tags($this->title ?? ''));
+        $this->content = htmlspecialchars(strip_tags($this->content ?? ''));
+        $this->excerpt = htmlspecialchars(strip_tags($this->excerpt ?? ''));
+        $this->image = htmlspecialchars(strip_tags($this->image ?? ''));
+        $this->status = htmlspecialchars(strip_tags($this->status ?? ''));
         // bind values
         $stmt->bindParam(":title", $this->title);
         $stmt->bindParam(":content", $this->content);

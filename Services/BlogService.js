@@ -50,10 +50,7 @@ class BlogService {
             const response = await fetch('/mali-clear-clinic/api/blog/Blog.php', {
                 method: 'POST',
                 credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(blogData)
+                body: blogData
             });
 
             const data = await response.json();
