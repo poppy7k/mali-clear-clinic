@@ -1,4 +1,6 @@
 import { getUserSession } from '/mali-clear-clinic/scripts/auth/userSession.js';
+import { toastManager } from '/mali-clear-clinic/scripts/utils/toast.js';
+
 
 class PurchaseForm extends HTMLElement {
     constructor() {
@@ -10,26 +12,15 @@ class PurchaseForm extends HTMLElement {
     }
 
     async connectedCallback() {
-        const user = await getUserSession();
-        if (!user) {
+        this.user = await getUserSession();
+        if (!this.user) {
             window.location.href = '/mali-clear-clinic/pages/login.html';
             return;
         }
-        this.user = user;
+
         await this.loadProductDetails();
         this.render();
         this.setupEventListeners();
-    }
-
-    getProductDetailsFromUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        this.productId = urlParams.get('product_id');
-        
-        if (!this.productId) {
-            alert('ไม่พบข้อมูลสินค้า');
-            window.location.href = '/mali-clear-clinic/pages/service.html';
-            return;
-        }
     }
 
     async loadProductDetails() {
@@ -38,11 +29,12 @@ class PurchaseForm extends HTMLElement {
             if (!response.ok) {
                 throw new Error('ไม่สามารถโหลดข้อมูลสินค้าได้');
             }
-            this.product = await response.json();
-            console.log(this.product);
+            const result = await response.json();
+            this.product = result.data; // ✅ แก้ไขให้ดึงข้อมูลจาก `result.data`
+            console.log('Product loaded:', this.product);
         } catch (error) {
             console.error('Error loading product:', error);
-            this.showErrorMessage('ไม่สามารถโหลดข้อมูลสินค้าได้ กรุณาลองใหม่อีกครั้ง');
+            toastManager.addToast('error', 'ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการสั่งซื้อ กรุณาลองใหม่อีกครั้ง');
         }
     }
 
@@ -51,64 +43,45 @@ class PurchaseForm extends HTMLElement {
             return;
         }
 
-        if (!this.product || !this.product.data) {
+        if (!this.product) {
             this.innerHTML = '<p class="text-center">ไม่พบข้อมูลสินค้า/บริการ</p>';
             return;
         }
 
-        const productData = this.product.data;
-        
         this.innerHTML = `
             <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">ซื้อสินค้า</h2>
             <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
                 <div class="flex gap-6">
-                    <img src="/mali-clear-clinic/assets/images/upload/${productData.image}" 
-                        alt="${productData.name}"
+                    <img src="/mali-clear-clinic/assets/images/upload/${this.product.image}" 
+                        alt="${this.product.name}"
                         class="w-40 h-40 object-cover rounded"
                         onerror="this.onerror=null;this.src='/mali-clear-clinic/assets/images/DD.jpg';"
                     >
                     
                     <div class="flex-1">
-                        <h1 class="text-2xl font-semibold mb-2">${productData.name}</h1>
-                        <p class="text-gray-600 mb-2">ประเภท: ${productData.category_name}</p>
-                        <p class="text-gray-600 mb-4">${productData.description}</p>
+                        <h1 class="text-2xl font-semibold mb-2">${this.product.name}</h1>
+                        <p class="text-gray-600 mb-2">ประเภท: ${this.product.category_name}</p>
+                        <p class="text-gray-600 mb-4">${this.product.description}</p>
                         <div class="text-lg font-bold text-green-600 mb-4">
-                            ฿${parseFloat(productData.price).toLocaleString()}
+                            ฿${parseFloat(this.product.price).toLocaleString()}
                         </div>
                         
                         <div class="flex items-center gap-4 mb-6">
                             <span class="text-gray-700">จำนวน:</span>
                             <div class="flex items-center gap-2">
-                                <custom-button 
-                                    class="decrease-quantity"
-                                    text="-"
-                                    color="gray-700"
-                                    bgColor="gray-100"
-                                    hoverBg="gray-200">
-                                </custom-button>
+                                <button class="decrease-quantity px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">-</button>
                                 <span class="quantity-display w-12 text-center">${this.quantity}</span>
-                                <custom-button 
-                                    class="increase-quantity"
-                                    text="+"
-                                    color="gray-700"
-                                    bgColor="gray-100"
-                                    hoverBg="gray-200">
-                                </custom-button>
+                                <button class="increase-quantity px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">+</button>
                             </div>
                         </div>
 
                         <div class="flex justify-between items-center">
                             <div class="text-lg font-bold total-price">
-                                รวมทั้งหมด: ฿${(parseFloat(productData.price) * this.quantity).toLocaleString()}
+                                รวมทั้งหมด: ฿${(parseFloat(this.product.price) * this.quantity).toLocaleString()}
                             </div>
-                            <custom-button 
-                                class="confirm-purchase"
-                                text="ยืนยันการสั่งซื้อ"
-                                color="white"
-                                bgColor="green-600"
-                                hoverBg="green-700"
-                                icon="cart">
-                            </custom-button>
+                            <button class="confirm-purchase px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                ยืนยันการสั่งซื้อ
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -141,63 +114,47 @@ class PurchaseForm extends HTMLElement {
         }
 
         const totalPriceDisplay = this.querySelector('.total-price');
-        if (totalPriceDisplay && this.product?.data?.price) {
-            const total = parseFloat(this.product.data.price) * this.quantity;
+        if (totalPriceDisplay && this.product?.price) {
+            const total = parseFloat(this.product.price) * this.quantity;
             totalPriceDisplay.textContent = `รวมทั้งหมด: ฿${total.toLocaleString()}`;
         }
     }
 
     async handlePurchase() {
         if (!this.user) {
-            alert('กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ');
+            toastManager.addToast('error', 'ข้อผิดพลาด', 'กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ');
             return;
         }
-
+    
         try {
             const purchaseData = {
-                userId: this.userId,
-                productId: this.productId,
+                user_id: this.user.user_id,
+                product_id: this.productId,
                 quantity: this.quantity,
-                totalPrice: this.product.price * this.quantity
+                total_price: parseFloat(this.product.price) * this.quantity
             };
-
+    
+            console.log('Sending purchase data:', purchaseData);
+    
             const response = await fetch('/mali-clear-clinic/api/purchase/Purchase.php', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(purchaseData)
             });
-
-            if (!response.ok) {
-                throw new Error('การสั่งซื้อไม่สำเร็จ');
-            }
-
+    
             const result = await response.json();
             if (result.status === 'success') {
-                this.showSuccessMessage();
+                toastManager.addToast('success', 'สำเร็จ', 'สั่งซื้อสำเร็จ! กำลังพาคุณไปยังหน้าบริการ...');
                 setTimeout(() => {
                     window.location.href = '/mali-clear-clinic/pages/service.html';
                 }, 2000);
             } else {
-                this.showErrorMessage(result.message);
+                toastManager.addToast('error', 'ข้อผิดพลาด', result.message);
             }
         } catch (error) {
             console.error('Error during purchase:', error);
-            this.showErrorMessage('เกิดข้อผิดพลาดในการสั่งซื้อ กรุณาลองใหม่อีกครั้ง');
+            toastManager.addToast('error', 'ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการสั่งซื้อ กรุณาลองใหม่อีกครั้ง');
         }
-    }
-
-    showSuccessMessage() {
-        const messageElement = this.querySelector('#success-message') || this.createMessageElement('success');
-        messageElement.textContent = 'สั่งซื้อสำเร็จ! กำลังพาคุณไปยังหน้าบริการ...';
-        messageElement.classList.remove('hidden');
-    }
-
-    showErrorMessage(message) {
-        const messageElement = this.querySelector('#error-message') || this.createMessageElement('error');
-        messageElement.textContent = message;
-        messageElement.classList.remove('hidden');
     }
 
     createMessageElement(type) {
@@ -216,4 +173,4 @@ class PurchaseForm extends HTMLElement {
     }
 }
 
-customElements.define('purchase-form', PurchaseForm); 
+customElements.define('purchase-form', PurchaseForm);
