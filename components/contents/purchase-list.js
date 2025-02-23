@@ -249,4 +249,4 @@ class PurchaseList extends HTMLElement {
     }
 }
 
-customElements.define('purchase-list', PurchaseList); 
+customElements.define('purchase-list', PurchaseList);  

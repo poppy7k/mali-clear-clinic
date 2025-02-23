@@ -35,7 +35,7 @@ class CustomNavbar extends HTMLElement {
             { href: "/mali-clear-clinic/index.html", text: "หน้าหลัก", icon: "home.html" },
             { href: "/mali-clear-clinic/pages/service.html", text: "สินค้าและบริการ", icon: "service.html" },
             { href: "/mali-clear-clinic/pages/promotions.html", text: "โปรโมชั่น", icon: "promo.html" },
-            { href: "#", text: "บล็อกและเคล็ดลับ", icon: "blog.html" },
+            { href: "/mali-clear-clinic/pages/blog.html", text: "บล็อกและเคล็ดลับ", icon: "blog.html" },
             { href: "#", text: "ติดต่อเรา", icon: "contact.html" }
         ];
 

@@ -24,6 +24,11 @@ class ProductServiceList extends HTMLElement {
             this.setLoadingState();
             const allProducts = await ProductService.getAllProducts();
             
+            // Debug: แสดง category_id ของแต่ละผลิตภัณฑ์
+            allProducts.forEach(product => {
+                console.log(`Product ID: ${product.id}, Category ID: ${product.category_id}`);
+            });
+
             // กรองเฉพาะสินค้าที่มีสถานะ ACTIVE, หมวดหมู่ที่เลือก, และประเภทที่เลือก
             this.products = allProducts.filter(product => 
                 product.status === 'ACTIVE' && 
