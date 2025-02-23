@@ -7,7 +7,7 @@ class ConfirmationModal extends HTMLElement {
 
     connectedCallback() {
         this.innerHTML = `
-            <div id="modal-backdrop" class="fixed inset-0 bg-gray-700 opacity-75 hidden z-60"></div>
+            <div id="modal-backdrop" class="fixed inset-0 bg-gray-700 opacity-75 hidden z-40"></div>
             <div id="modal" class="fixed inset-0 flex items-center justify-center hidden z-50">
                 <div class="modal-content bg-white rounded-2xl shadow-lg w-96 transform transition-all opacity-0 scale-75">
                     <div class="p-6">

@@ -43,8 +43,12 @@ try {
             $stmt->execute([$category_id]);
             echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
         } else {
-            $categories = $category->readAll();
-            echo json_encode(["status" => "success", "categories" => $categories]);
+            $categories = $category->getAllCategories();
+            if ($categories) {
+                echo json_encode(["status" => "success", "data" => $categories]);
+            } else {
+                echo json_encode(["status" => "error", "message" => "No categories found"]);
+            }
         }
         exit;
     }

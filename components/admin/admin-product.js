@@ -94,7 +94,7 @@ class AdminProduct extends HTMLElement {
             this.renderProductsTable();
         } catch (error) {
             console.error('Error loading products:', error);
-            toastManager.addToast('error', 'ข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลสินค้าได้');
+            toastManager.addToast('danger', 'ข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลสินค้าได้');
         } finally {
             this.loadingModal.hide();
         }

@@ -13,7 +13,7 @@ class Category {
     // ✅ กำหนด Schema ของตาราง `categories`
     public static $schema = [
         "id" => "INT AUTO_INCREMENT PRIMARY KEY",
-        "name" => "VARCHAR(100) NOT NULL UNIQUE",
+        "name" => "VARCHAR(100) NOT NULL",
         "created_at" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
     ];
 
@@ -41,9 +41,8 @@ class Category {
         return $stmt->execute();
     }
 
-    // ✅ ดึงข้อมูล Category ทั้งหมด
-    public function readAll() {
-        $query = "SELECT * FROM " . $this->table_name . " ORDER BY created_at DESC";
+    public function getAllCategories() {
+        $query = "SELECT * FROM " . $this->table_name . " ORDER BY name ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
