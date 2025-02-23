@@ -1,5 +1,6 @@
 <?php
 require_once 'Database.php';
+require_once 'TableManager.php'; // ✅ เรียกใช้ TableManager
 
 class Booking {
     private $conn;
@@ -14,26 +15,22 @@ class Booking {
 
     public function __construct($db) {
         $this->conn = $db;
+
+        // ✅ ใช้ TableManager เพื่อตรวจสอบและอัปเดตโครงสร้างตาราง
+        $tableManager = new TableManager($this->conn);
+        $tableManager->validateAndUpdateTableStructure($this->table_name, [
+            "id" => "INT AUTO_INCREMENT PRIMARY KEY",
+            "user_id" => "INT NOT NULL",
+            "product_id" => "INT NOT NULL",
+            "booking_date" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+            "status" => "VARCHAR(50) DEFAULT 'Pending'",
+            "created_at" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+            "FOREIGN KEY (user_id)" => "REFERENCES users(id) ON DELETE CASCADE",
+            "FOREIGN KEY (product_id)" => "REFERENCES products(id) ON DELETE CASCADE"
+        ]);
     }
 
-    public function createTableIfNotExists() {
-        $query = "
-        CREATE TABLE IF NOT EXISTS bookings (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT NOT NULL,
-            product_id INT NOT NULL,
-            booking_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            status VARCHAR(50) DEFAULT 'Pending',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id),
-            FOREIGN KEY (product_id) REFERENCES products(id)
-        )";
-
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-    }
-
-    // เพิ่มการจองใหม่
+    // ✅ เพิ่มการจองใหม่
     public function create() {
         $query = "INSERT INTO " . $this->table_name . " (user_id, product_id, status) VALUES (:user_id, :product_id, :status)";
         $stmt = $this->conn->prepare($query);
@@ -45,7 +42,7 @@ class Booking {
         return $stmt->execute();
     }
 
-    // ดึงข้อมูลการจองทั้งหมด
+    // ✅ ดึงข้อมูลการจองทั้งหมด
     public function getAll() {
         $sql = "SELECT b.id, b.product_id, p.name AS product_name, 
                 b.booking_date, b.status, b.user_id, u.username
@@ -59,7 +56,7 @@ class Booking {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // อัปเดตสถานะการจอง
+    // ✅ อัปเดตสถานะการจอง
     public function updateStatus($id, $status) {
         $query = "UPDATE " . $this->table_name . " SET status = :status WHERE id = :id";
         $stmt = $this->conn->prepare($query);
@@ -69,6 +66,7 @@ class Booking {
         return $stmt->execute();
     }
 
+    // ✅ ดึงการจองตาม User ID
     public function getBookingsByUserId($userId) {
         $sql = "SELECT b.id, b.product_id, p.name AS product_name, 
                 b.booking_date, b.status, b.user_id, u.username
