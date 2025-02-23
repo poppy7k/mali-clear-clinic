@@ -18,7 +18,8 @@ class AdminPromotions extends HTMLElement {
     }
 
     async loadPromotions() {
-        this.promotions = await PromotionService.getPromotions();
+        const response = await PromotionService.getPromotions();
+        this.promotions = response.data || []; // ✅ ดึง `data` จาก response
         this.render();
     }
 

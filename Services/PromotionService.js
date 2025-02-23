@@ -5,10 +5,13 @@ export class PromotionService {
             throw new Error(`HTTP Error! Status: ${response.status}`);
         }
         const result = await response.json();
+    
         if (result.status !== 'success') {
-            throw new Error(result.message || 'Unknown API error');
+            console.error("❌ API Error:", result.message);
+            return null; // ✅ คืนค่า null ถ้าสถานะไม่ใช่ success
         }
-        return result.data;
+    
+        return result; // ✅ คืน result ทั้งหมด แทนที่จะคืนแค่ result.data
     }
 
     // ✅ ดึงข้อมูลโปรโมชั่นทั้งหมด
@@ -29,13 +32,18 @@ export class PromotionService {
                 method: 'POST',
                 body: formData
             });
-            return await this.handleResponse(response);
+    
+            const result = await this.handleResponse(response);
+            if (result) {
+                return result; // ✅ คืนค่าที่ถูกต้อง
+            }
+            return null; // ✅ ถ้าเกิดข้อผิดพลาด ให้คืนค่า null
         } catch (error) {
             console.error('Error creating promotion:', error);
-            return { status: 'error', message: error.message };
+            return null; // ✅ ป้องกันการคืนค่า undefined
         }
     }
-
+    
     // ✅ ลบโปรโมชั่น
     static async deletePromotion(id) {
         try {

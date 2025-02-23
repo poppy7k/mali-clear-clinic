@@ -9,7 +9,8 @@ class Promotions extends HTMLElement {
     async connectedCallback() {
         this.setLoadingState(); // ✅ แสดง Loading ระหว่างดึงข้อมูล
         try {
-            this.promotions = await PromotionService.getPromotions();
+            const response = await PromotionService.getPromotions();
+            this.promotions = response.data || []; // ✅ ดึง `data` จาก response
             this.render();
         } catch (error) {
             console.error("Error fetching promotions:", error);

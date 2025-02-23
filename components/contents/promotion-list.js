@@ -1,3 +1,5 @@
+import { PromotionService } from '../../services/PromotionService.js';
+
 class ContentPromotions extends HTMLElement {
     constructor() {
         super();
@@ -9,20 +11,9 @@ class ContentPromotions extends HTMLElement {
     }
 
     async loadPromotions() {
-        try {
-            const response = await fetch('/mali-clear-clinic/api/promotion/Promotion.php');
-            const result = await response.json();
-            
-            if (result.status === 'success') {
-                this.promotions = result.data;
-                this.render();
-            } else {
-                this.setErrorState("ไม่สามารถโหลดข้อมูลโปรโมชั่นได้");
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            this.setErrorState("เกิดข้อผิดพลาดในการโหลดข้อมูล");
-        }
+        const response = await PromotionService.getPromotions();
+        this.promotions = response.data || []; // ✅ ดึง `data` จาก response
+        this.render();
     }
 
     setErrorState(message) {

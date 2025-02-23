@@ -37,7 +37,9 @@ class ContentPromotionDetails extends HTMLElement {
         }
 
         try {
-            this.promotion = await PromotionService.getPromotionById(id);
+            const response = await PromotionService.getPromotionById(id);
+            this.promotion = response.data || []; // ✅ ดึง `data` จาก response
+            console.log(response.data)
             this.render();
         } catch (error) {
             console.error('Error loading promotion details:', error);
@@ -76,35 +78,19 @@ class ContentPromotionDetails extends HTMLElement {
                             <div>
                                 <h3 class="text-xl font-semibold mb-4">${this.promotion.title}</h3>
                                 <p class="text-gray-600 mb-6">${this.promotion.description}</p>
-                                
-                                <div class="border-t pt-6">
-                                    <h4 class="text-lg font-semibold mb-4">รายการสินค้า/บริการในโปรโมชั่น</h4>
-                                    ${this.promotion.items && this.promotion.items.length > 0 ? `
-                                        <ul class="space-y-3">
-                                            ${this.promotion.items.map(item => `
-                                                <li class="flex items-center justify-between p-3 bg-gray-50 rounded">
-                                                    <span>${item.name}</span>
-                                                    <span class="text-green-600 font-semibold">${item.price} บาท</span>
-                                                </li>
-                                            `).join('')}
-                                        </ul>
-                                    ` : `
-                                        <p class="text-gray-500">ไม่มีรายการสินค้า/บริการ</p>
-                                    `}
-                                </div>
 
-                                <div class="mt-8">
-                                    <custom-button 
-                                        text="จองคิว"
-                                        color="white"
-                                        bgColor="green-600"
-                                        hoverBg="green-500"
-                                        icon=""
-                                        onclick="window.location.href='/mali-clear-clinic/pages/booking.html'"
-                                        class="w-full">
-                                    </custom-button>
-                                </div>
                             </div>
+                        </div>
+                        <div class="mt-8">
+                            <custom-button 
+                                text="จองคิว"
+                                color="white"
+                                bgColor="green-600"
+                                hoverBg="green-500"
+                                icon=""
+                                onclick="window.location.href='/mali-clear-clinic/pages/booking.html'"
+                                class="w-full">
+                            </custom-button>
                         </div>
                     </div>
                 </div>
