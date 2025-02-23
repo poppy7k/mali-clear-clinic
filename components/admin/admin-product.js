@@ -5,21 +5,38 @@ class AdminProduct extends HTMLElement {
     constructor() {
         super();
         this.products = [];
+        this.confirmationModal = null;
     }
 
-    connectedCallback() {
-        this.render();
-        this.setupEventListeners();
-        this.checkAdminAndLoadData();
-    }
+    async connectedCallback() {
+        try {
+            const user = await getUserSession();
+            if (!user || user.role !== 'ADMIN') {
+                window.location.href = '/mali-clear-clinic/index.html';
+                return;
+            }
 
-    async checkAdminAndLoadData() {
-        const user = await getUserSession();
-        if (!user || user.role !== 'ADMIN') {
-            window.location.href = '/mali-clear-clinic/index.html';
-            return;
+            await this.initializeConfirmationModal();
+            this.render();
+            this.setupEventListeners();
+            this.loadProducts();
+            this.confirmationModal = this.querySelector('confirmation-modal');
+        } catch (error) {
+            console.error('Error:', error);
         }
-        this.loadProducts();
+    }
+
+    async initializeConfirmationModal() {
+        return new Promise((resolve) => {
+            this.confirmationModal = document.createElement('confirmation-modal');
+            document.body.appendChild(this.confirmationModal);
+
+            if (this.confirmationModal.isConnected) {
+                resolve();
+            } else {
+                this.confirmationModal.addEventListener('connected', resolve, { once: true });
+            }
+        });
     }
 
     render() {
@@ -56,6 +73,8 @@ class AdminProduct extends HTMLElement {
                     </table>
                 </div>
             </div>
+            
+            <confirmation-modal></confirmation-modal>
         `;
     }
 
@@ -227,18 +246,30 @@ class AdminProduct extends HTMLElement {
     }
 
     async deleteProduct(id) {
-        if (confirm('คุณต้องการลบรายการนี้ใช่หรือไม่?')) {
-            try {
-                // TODO: เรียก API เพื่อลบข้อมูล
-                console.log('Deleting product:', id);
-                toastManager.addToast('success', 'สำเร็จ', 'ลบข้อมูลเรียบร้อยแล้ว');
-                this.loadProducts();
-            } catch (error) {
-                console.error('Error deleting product:', error);
-                toastManager.addToast('error', 'ข้อผิดพลาด', 'ไม่สามารถลบข้อมูลได้');
-            }
+        const productToDelete = this.products.find(p => p.id === parseInt(id));
+        if (!productToDelete) return;
+
+        if (!this.confirmationModal?.open) {
+            console.error('❌ Confirmation modal is not ready');
+            return;
         }
+
+        this.confirmationModal.open(
+            'ยืนยันการลบ',
+            `คุณต้องการลบ "${productToDelete.name}" ใช่หรือไม่?`,
+            async () => {
+                try {
+                    // TODO: เรียก API เพื่อลบข้อมูล
+                    console.log('Deleting product:', id);
+                    toastManager.addToast('success', 'สำเร็จ', 'ลบข้อมูลเรียบร้อยแล้ว');
+                    this.loadProducts();
+                } catch (error) {
+                    console.error('Error deleting product:', error);
+                    toastManager.addToast('error', 'ข้อผิดพลาด', 'ไม่สามารถลบข้อมูลได้');
+                }
+            }
+        );
     }
 }
 
-customElements.define('admin-product', AdminProduct); 
+customElements.define('admin-product', AdminProduct);
