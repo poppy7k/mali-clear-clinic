@@ -7,7 +7,7 @@ class CategoryList extends HTMLElement {
 
     async connectedCallback() {
         this.innerHTML = `
-            <div class="bg-white rounded-lg shadow-sm">
+            <div class="bg-white rounded-lg shadow-sm z-10">
                 <div class="flex flex-col space-y-2">
                     <button class="category-btn text-left px-4 py-2 rounded transition-colors duration-200 hover:bg-yellow-50 bg-yellow-100 text-yellow-700 font-medium" data-id="">
                         ทั้งหมด

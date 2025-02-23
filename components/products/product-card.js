@@ -12,8 +12,8 @@ class ProductCard extends HTMLElement {
 
     render() {
         this.innerHTML = `
-            <div class="bg-white rounded-lg shadow-md overflow-hidden relative">
-                <div class="absolute top-3 right-2.5 z-10">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden relative z-10">
+                <div class="absolute top-3 right-2.5 z-0">
                     <span class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 ${
                         this.product.type === 'SERVICE' 
                         ? 'bg-green-100 text-green-800' 

@@ -44,7 +44,7 @@ class Products extends HTMLElement {
 
     render() {
         this.innerHTML = `
-            <div class="container mx-auto px-4 py-8">
+            <div class="container mx-auto px-4 py-8 z-10">
                 <div class="flex justify-center space-x-4 mb-8">
                     <button 
                         class="px-4 py-2 rounded ${this.activeTab === 'all' ? 'bg-yellow-400' : 'bg-gray-200'}"

@@ -4,7 +4,7 @@ class ProductServiceList extends HTMLElement {
         this.selectedCategory = "";
         this.selectedType = "all";
         this.innerHTML = `
-            <div class="container mx-auto py-2">
+            <div class="container mx-auto py-2 z-10">
                 <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Our Products and Services</h2>
                 
                 <div class="flex gap-6">
@@ -53,8 +53,8 @@ class ProductServiceList extends HTMLElement {
                     </div>
 
                     <!-- Products Grid -->
-                    <div class="w-3/4">
-                        <div id="productServiceList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="w-3/4 z-10">
+                        <div id="productServiceList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 z-10">
                         </div>
                     </div>
                 </div>
