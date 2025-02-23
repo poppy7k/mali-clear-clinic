@@ -1,7 +1,7 @@
 import { getUserSession } from "/mali-clear-clinic/scripts/auth/userSession.js";
 import BookingService from '../../services/BookingService.js';
 import { handleError } from '../../utils/ErrorHandler.js';
-import { showToast } from '../../utils/Toast.js';
+import { toastManager } from '../../scripts/utils/toast.js';
 
 class MyBookings extends HTMLElement {
     constructor() {
@@ -20,7 +20,7 @@ class MyBookings extends HTMLElement {
             this.render();
             await this.loadBookings();
         } catch (error) {
-            showToast('error', handleError(error, 'MyBookings'));
+            toastManager.addToast('error', 'เกิดข้อผิดพลาด', handleError(error, 'MyBookings'));
         }
     }
 
@@ -49,7 +49,7 @@ class MyBookings extends HTMLElement {
                 `).join("")
                 : "<tr><td colspan='4' class='p-4 text-center'>ไม่พบข้อมูลการจอง</td></tr>";
         } catch (error) {
-            showToast('error', handleError(error, 'MyBookings'));
+            toastManager.addToast('error', 'เกิดข้อผิดพลาด', handleError(error, 'MyBookings'));
         }
     }
 

@@ -1,7 +1,8 @@
 import { getUserSession } from "/mali-clear-clinic/scripts/auth/userSession.js";
 import BookingService from '../../services/BookingService.js';
 import { handleError } from '../../utils/ErrorHandler.js';
-import { showToast } from '../../utils/Toast.js';
+import { toastManager } from '../../scripts/utils/toast.js';
+
 
 class AdminBooking extends HTMLElement {
     constructor() {
@@ -53,7 +54,7 @@ class AdminBooking extends HTMLElement {
             console.error('Confirmation modal is not ready');
             return;
         }
-
+    
         this.confirmationModal.open(
             'ยืนยันการลบ',
             'คุณต้องการลบการจองนี้ใช่หรือไม่?',
@@ -62,13 +63,15 @@ class AdminBooking extends HTMLElement {
                     await BookingService.deleteBooking(bookingId);
                     await this.loadBookings();
                     this.render();
-                    showToast('success', 'ลบการจองสำเร็จ');
+                    
+                    toastManager.addToast('success', 'ลบการจองสำเร็จ', 'ข้อมูลถูกลบเรียบร้อยแล้ว');
                 } catch (error) {
-                    showToast('error', handleError(error, 'AdminBooking'));
+                    toastManager.addToast('error', 'เกิดข้อผิดพลาด', handleError(error, 'AdminBooking'));
                 }
             }
         );
     }
+    
 
     showSuccessMessage(message) {
         this.showMessage(message, 'success');
