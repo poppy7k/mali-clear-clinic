@@ -32,19 +32,6 @@ class CustomButton extends HTMLElement {
         } else {
             this.renderButton('', text, color, href, hoverBg, hoverText, id, addClass, bgColor, type, align);
         }
-
-        const btn = this.querySelector("button");
-        btn.addEventListener("click", (event) => {
-            this.dispatchEvent(new CustomEvent("custom-btn-click", {
-                bubbles: true,
-                composed: true,
-                detail: { text }
-            }));
-
-            if (type === "submit") {
-                this.closest("form").requestSubmit();
-            }
-        });
     }
 
     renderButton(iconHtml, text, color, href, hoverBg, hoverText, id, addClass, bgColor, type, align) {

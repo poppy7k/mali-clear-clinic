@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โปรไฟล์ - Mali Clear Clinic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Components -->
+    <script type="module" src="/mali-clear-clinic/components/layouts/layout-navbar.js"></script>
+    <script type="module" src="/mali-clear-clinic/components/buttons/custom-button.js"></script>
+    <script type="module" src="/mali-clear-clinic/components/toast/toast-container.js" defer></script>
+    
+    <!-- Scripts -->
+    <script type="module" src="/mali-clear-clinic/scripts/auth/userSession.js"></script>
+    <script type="module" src="/mali-clear-clinic/scripts/profile.js"></script>
+</head>
+<body class="bg-gray-100">
+    <layout-navbar></layout-navbar>
+    <toast-container></toast-container>
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6">โปรไฟล์ของฉัน</h1>
+            
+            <div class="space-y-6">
+                <!-- ข้อมูลส่วนตัว -->
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-700 mb-4">ข้อมูลส่วนตัว</h2>
+                    <form id="profile-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อผู้ใช้</label>
+                                <input type="text" id="username" class="w-full px-3 py-2 border border-gray-300 rounded-md" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">อีเมล</label>
+                                <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-md" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ</label>
+                                <input type="text" id="firstName" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">นามสกุล</label>
+                                <input type="text" id="lastName" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">เบอร์โทรศัพท์</label>
+                                <input type="tel" id="phone" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <custom-button 
+                                text="บันทึกข้อมูล"
+                                color="white"
+                                bgColor="green-600"
+                                hoverBg="green-500"
+                                type="submit"
+                                class="w-auto">
+                            </custom-button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- เปลี่ยนรหัสผ่าน -->
+                <div class="pt-6 border-t border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-4">เปลี่ยนรหัสผ่าน</h2>
+                    <form id="password-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่านปัจจุบัน</label>
+                                <input type="password" id="currentPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div></div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่านใหม่</label>
+                                <input type="password" id="newPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">ยืนยันรหัสผ่านใหม่</label>
+                                <input type="password" id="confirmPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <custom-button 
+                                text="เปลี่ยนรหัสผ่าน"
+                                color="white"
+                                bgColor="blue-600"
+                                hoverBg="blue-500"
+                                type="submit"
+                                class="w-auto">
+                            </custom-button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

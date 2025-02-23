@@ -74,12 +74,13 @@ class CustomNavbar extends HTMLElement {
                         <div class="flex-grow border-t border-gray-300"></div>
                     </div>
                     <ul class="py-2">
+                        ${await this.renderNavItem("/mali-clear-clinic/pages/profile.html", "โปรไฟล์", "user.html", "h-5 w-5", "p-1")}
                         ${await this.renderNavItem("/mali-clear-clinic/pages/my-booking.html", "การจองของฉัน", "bookings.html", "h-5 w-5", "p-1")}
                         <li class="px-1 py-2 rounded-md hover:bg-gray-100 hover:text-black cursor-pointer">
                             <button id="logout-btn" class="px-1 flex text-sm text-gray-600 flex items-center gap-2 cursor-pointer">
                                 ${await this.loadIcon("logout.html", "h-6 w-6 text-red-500", "px-1")}
                                 <span class="text-red-500">ออกจากระบบ</span>
-                            </a>
+                            </button>
                         </li>
                     </ul>
                 </div>
