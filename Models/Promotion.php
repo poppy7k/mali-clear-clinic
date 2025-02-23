@@ -11,23 +11,22 @@ class Promotion {
     public $image;
     public $created_at;
 
+    public static $schema = [
+        "id" => "INT AUTO_INCREMENT PRIMARY KEY",
+        "title" => "VARCHAR(100) NOT NULL",
+        "description" => "TEXT",
+        "image" => "VARCHAR(255)",
+        "created_at" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+    ];
+
     public function __construct($db) {
         $this->conn = $db;
-    }
 
-    public function createTableIfNotExists() {
-        $query = "
-        CREATE TABLE IF NOT EXISTS promotions (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            title VARCHAR(100) NOT NULL,
-            description TEXT,
-            image VARCHAR(255),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )";
+        // ✅ ใช้ TableManager เพื่อตรวจสอบและอัปเดตโครงสร้างตาราง
+        $tableManager = new TableManager($this->conn);
+        $tableManager->validateAndUpdateTableStructure($this->table_name, self::$schema);
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-
+        // ✅ Seed ข้อมูลโปรโมชั่น (ถ้ายังไม่มี)
         $this->seedPromotions();
     }
 

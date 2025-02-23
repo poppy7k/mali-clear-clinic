@@ -15,27 +15,27 @@ class Product {
     public $type;
     public $created_at;
 
+    public static $schema = [
+        "id" => "INT AUTO_INCREMENT PRIMARY KEY",
+        "category_id" => "INT NOT NULL",
+        "name" => "VARCHAR(100) NOT NULL",
+        "price" => "DECIMAL(10,2) NOT NULL",
+        "image" => "VARCHAR(255)",
+        "description" => "TEXT",
+        "type" => "ENUM('PRODUCT', 'SERVICE') NOT NULL",
+        "created_at" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "CONSTRAINT fk_products_category" => "FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE"
+    ];
+    
+
     public function __construct($db) {
         $this->conn = $db;
-    }
 
-    public function createTableIfNotExists() {
-        $query = "
-        CREATE TABLE IF NOT EXISTS products (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            category_id INT NOT NULL,
-            name VARCHAR(100) NOT NULL,
-            price DECIMAL(10,2) NOT NULL,
-            image VARCHAR(255),
-            description TEXT,
-            type ENUM('PRODUCT', 'SERVICE') NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
-        )";
+        // ✅ ใช้ TableManager เพื่อตรวจสอบและอัปเดตโครงสร้างตาราง
+        $tableManager = new TableManager($this->conn);
+        $tableManager->validateAndUpdateTableStructure($this->table_name, self::$schema);
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-
+        // ✅ Seed ข้อมูลสินค้า (ถ้ายังไม่มี)
         $this->seedProducts();
     }
 

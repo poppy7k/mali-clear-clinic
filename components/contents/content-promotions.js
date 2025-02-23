@@ -1,35 +1,51 @@
+import { PromotionService } from '../../services/promotion-services.js';
+
 class Promotions extends HTMLElement {
     constructor() {
         super();
+        this.promotions = [];
     }
 
     async connectedCallback() {
-        await this.loadPromotions();
-    }
-
-    async loadPromotions() {
+        this.setLoadingState(); // ✅ แสดง Loading ระหว่างดึงข้อมูล
         try {
-            console.log('Loading promotions...');
-            const response = await fetch('/mali-clear-clinic/api/promotion/Promotion.php');
-            const result = await response.json();
-            console.log('Promotions result:', result);
-            
-            if (result.status === 'success') {
-                this.renderPromotions(result.data);
-            } else {
-                console.error('Failed to load promotions:', result.message);
-            }
+            this.promotions = await PromotionService.getPromotions();
+            this.render();
         } catch (error) {
-            console.error('Error loading promotions:', error);
+            console.error("Error fetching promotions:", error);
+            this.setErrorState("ไม่สามารถโหลดโปรโมชั่นได้ กรุณาลองใหม่");
         }
     }
 
-    renderPromotions(promotions) {
+    setLoadingState() {
+        this.innerHTML = `
+            <div class="container mx-auto py-8 text-center">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8">Promotions</h2>
+                <p class="text-gray-600">กำลังโหลดโปรโมชั่น...</p>
+            </div>
+        `;
+    }
+
+    setErrorState(message) {
+        this.innerHTML = `
+            <div class="container mx-auto py-8 text-center">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8">Promotions</h2>
+                <p class="text-red-600">${message}</p>
+            </div>
+        `;
+    }
+
+    render() {
+        if (!this.promotions || this.promotions.length === 0) {
+            this.setErrorState("ไม่มีโปรโมชั่นในขณะนี้");
+            return;
+        }
+
         this.innerHTML = `
             <div class="container mx-auto py-8">
                 <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Promotions</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    ${promotions.map(promo => `
+                    ${this.promotions.map(promo => `
                         <div class="bg-white p-6 rounded-lg shadow-md">
                             <h3 class="text-xl font-semibold text-gray-800 mb-4">${promo.title}</h3>
                             <img src="/mali-clear-clinic/assets/images/${promo.image}" 

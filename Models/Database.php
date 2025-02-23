@@ -1,9 +1,16 @@
 <?php
+require_once 'TableManager.php';
+require_once 'User.php';
+require_once 'Category.php';
+require_once 'Product.php';
+require_once 'Booking.php';
+require_once 'Promotion.php';
+
 class Database {
     private $host = 'localhost';
     private $db_name = 'maliclearclinic';
-    private $username = 'root';  // ชื่อผู้ใช้ MySQL
-    private $password = '';      // รหัสผ่าน MySQL
+    private $username = 'root';
+    private $password = '';
     private $conn;
 
     public function getConnection() {
@@ -13,7 +20,7 @@ class Database {
             $this->conn = new PDO("mysql:host={$this->host};dbname={$this->db_name}", $this->username, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            // ตรวจสอบและสร้างตาราง 'users' ถ้ายังไม่มี
+            // ✅ ตรวจสอบและอัปเดตโครงสร้างตาราง
             $this->initializeTables();
             
         } catch (PDOException $exception) {
@@ -25,23 +32,16 @@ class Database {
     }
 
     private function initializeTables() {
-        require_once 'User.php';
-        require_once 'Category.php';
-        require_once 'Product.php';
-        require_once 'Booking.php';
-        require_once 'Promotion.php';
+        $tableManager = new TableManager($this->conn);
 
-        $user = new User($this->conn);
-        $category = new Category($this->conn);
-        $product = new Product($this->conn);
-        $booking = new Booking($this->conn);
-        $promotion = new Promotion($this->conn);
+        // ✅ ใช้ Schema จาก Model
+        $tableManager->validateAndUpdateTableStructure("bookings", Booking::$schema);
+        $tableManager->validateAndUpdateTableStructure("users", User::$schema);
+        $tableManager->validateAndUpdateTableStructure("categories", Category::$schema);
+        $tableManager->validateAndUpdateTableStructure("products", Product::$schema);
+        $tableManager->validateAndUpdateTableStructure("promotions", Promotion::$schema);
 
-        $user->createTableIfNotExists();
-        $category->createTableIfNotExists();
-        $product->createTableIfNotExists();
-        $booking->createTableIfNotExists();
-        $promotion->createTableIfNotExists();
+        error_log ("✅ All tables validated and updated successfully!\n");
     }
 }
 ?>

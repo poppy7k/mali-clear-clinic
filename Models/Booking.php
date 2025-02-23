@@ -13,21 +13,23 @@ class Booking {
     public $status;
     public $created_at;
 
+    public static $schema = [
+        "id" => "INT AUTO_INCREMENT PRIMARY KEY",
+        "user_id" => "INT NOT NULL",
+        "product_id" => "INT NOT NULL",
+        "booking_date" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "status" => "VARCHAR(50) DEFAULT 'Pending'",
+        "created_at" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "CONSTRAINT fk_bookings_user_id" => "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE",
+        "CONSTRAINT fk_bookings_product_id" => "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE"
+    ];
+
     public function __construct($db) {
         $this->conn = $db;
 
-        // ✅ ใช้ TableManager เพื่อตรวจสอบและอัปเดตโครงสร้างตาราง
+        // ✅ ใช้ TableManager อัปเดตโครงสร้างตาราง
         $tableManager = new TableManager($this->conn);
-        $tableManager->validateAndUpdateTableStructure($this->table_name, [
-            "id" => "INT AUTO_INCREMENT PRIMARY KEY",
-            "user_id" => "INT NOT NULL",
-            "product_id" => "INT NOT NULL",
-            "booking_date" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-            "status" => "VARCHAR(50) DEFAULT 'Pending'",
-            "created_at" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-            "FOREIGN KEY (user_id)" => "REFERENCES users(id) ON DELETE CASCADE",
-            "FOREIGN KEY (product_id)" => "REFERENCES products(id) ON DELETE CASCADE"
-        ]);
+        $tableManager->validateAndUpdateTableStructure($this->table_name, self::$schema);
     }
 
     // ✅ เพิ่มการจองใหม่

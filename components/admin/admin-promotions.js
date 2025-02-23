@@ -1,4 +1,5 @@
 import { getUserSession } from '../../scripts/auth/userSession.js';
+import { PromotionService } from '../../services/promotion-services.js';
 
 class AdminPromotions extends HTMLElement {
     constructor() {
@@ -7,72 +8,41 @@ class AdminPromotions extends HTMLElement {
     }
 
     async connectedCallback() {
-        // ตรวจสอบสิทธิ์ admin โดยใช้ getUserSession
         const user = await getUserSession();
         if (!user || user.role !== 'ADMIN') {
             window.location.href = '/mali-clear-clinic/';
             return;
         }
-        
         await this.loadPromotions();
         this.render();
     }
 
     async loadPromotions() {
-        try {
-            const response = await fetch('/mali-clear-clinic/api/promotion/Promotion.php');
-            const result = await response.json();
-            if (result.status === 'success') {
-                this.promotions = result.data;
-            }
-        } catch (error) {
-            console.error('Error loading promotions:', error);
-        }
+        this.promotions = await PromotionService.getPromotions();
+        this.render();
     }
 
     async deletePromotion(id) {
-        if (confirm('คุณต้องการลบโปรโมชั่นนี้ใช่หรือไม่?')) {
-            try {
-                const response = await fetch('/mali-clear-clinic/api/promotion/Promotion.php', {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ id: id })
-                });
-                
-                const result = await response.json();
-                if (result.status === 'success') {
-                    await this.loadPromotions();
-                    this.render();
-                } else {
-                    throw new Error(result.message || 'Failed to delete promotion');
-                }
-            } catch (error) {
-                console.error('Error deleting promotion:', error);
-                alert('ไม่สามารถลบโปรโมชั่นได้ กรุณาลองใหม่อีกครั้ง');
-            }
+        if (!confirm('คุณต้องการลบโปรโมชั่นนี้ใช่หรือไม่?')) return;
+
+        const result = await PromotionService.deletePromotion(id);
+        if (result) {
+            await this.loadPromotions();
+        } else {
+            alert('ลบโปรโมชั่นไม่สำเร็จ กรุณาลองใหม่');
         }
     }
 
     async handleSubmit(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
-        
-        try {
-            const response = await fetch('/mali-clear-clinic/api/promotion/Promotion.php', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            
-            if (result.status === 'success') {
-                event.target.reset();
-                await this.loadPromotions();
-                this.render();
-            }
-        } catch (error) {
-            console.error('Error creating promotion:', error);
+        const result = await PromotionService.createPromotion(formData);
+
+        if (result) {
+            event.target.reset();
+            await this.loadPromotions();
+        } else {
+            alert('เพิ่มโปรโมชั่นไม่สำเร็จ กรุณาลองใหม่');
         }
     }
 
@@ -80,85 +50,46 @@ class AdminPromotions extends HTMLElement {
         this.innerHTML = `
             <div class="container mx-auto px-4 py-8">
                 <h2 class="text-2xl font-bold mb-6">จัดการโปรโมชั่น</h2>
-                
-                <!-- ฟอร์มเพิ่มโปรโมชั่น -->
+
                 <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onsubmit="this.closest('admin-promotions').handleSubmit(event)">
                     <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="title">
-                            ชื่อโปรโมชั่น
-                        </label>
-                        <form-input 
-                            type="text"
-                            id="title"
-                            name="title"
-                            placeholder="กรอกชื่อโปรโมชั่น"
-                            required>
-                        </form-input>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">ชื่อโปรโมชั่น</label>
+                        <input type="text" name="title" required class="w-full px-3 py-2 border rounded-lg">
                     </div>
-                    
+
                     <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="description">
-                            รายละเอียด
-                        </label>
-                        <textarea 
-                            class="w-full my-2 px-3 py-2 rounded-lg ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-green-600 transition-all duration-300 outline-none"
-                            id="description" 
-                            name="description" 
-                            placeholder="กรอกรายละเอียดโปรโมชั่น"
-                            required>
-                        </textarea>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">รายละเอียด</label>
+                        <textarea name="description" required class="w-full px-3 py-2 border rounded-lg"></textarea>
                     </div>
-                    
+
                     <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="image">
-                            รูปภาพ
-                        </label>
-                        <form-input 
-                            type="file"
-                            id="image"
-                            name="image"
-                            accept="image/*"
-                            required>
-                        </form-input>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">รูปภาพ</label>
+                        <input type="file" name="image" accept="image/*" required class="w-full">
                     </div>
-                    
-                    <div class="flex items-center justify-between">
-                        <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-all duration-300" 
-                            type="submit">
-                            เพิ่มโปรโมชั่น
-                        </button>
-                    </div>
+
+                    <button class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded" type="submit">
+                        เพิ่มโปรโมชั่น
+                    </button>
                 </form>
 
-                <!-- ตารางแสดงโปรโมชั่น -->
                 <div class="bg-white shadow-md rounded my-6">
                     <table class="min-w-full">
                         <thead>
-                            <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                                <th class="py-3 px-6 text-left">รูปภาพ</th>
-                                <th class="py-3 px-6 text-left">ชื่อโปรโมชั่น</th>
-                                <th class="py-3 px-6 text-left">รายละเอียด</th>
-                                <th class="py-3 px-6 text-center">จัดการ</th>
+                            <tr class="bg-gray-200 text-gray-600 uppercase text-sm">
+                                <th class="py-3 px-6">รูปภาพ</th>
+                                <th class="py-3 px-6">ชื่อโปรโมชั่น</th>
+                                <th class="py-3 px-6">รายละเอียด</th>
+                                <th class="py-3 px-6">จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody class="text-gray-600 text-sm font-light">
+                        <tbody>
                             ${this.promotions.map(promo => `
-                                <tr class="border-b border-gray-200 hover:bg-gray-100">
-                                    <td class="py-3 px-6 text-left">
-                                        <img src="/mali-clear-clinic/assets/images/${promo.image}" 
-                                            alt="${promo.title}" 
-                                            class="w-20 h-20 object-cover rounded">
-                                    </td>
-                                    <td class="py-3 px-6 text-left">${promo.title}</td>
-                                    <td class="py-3 px-6 text-left">${promo.description}</td>
-                                    <td class="py-3 px-6 text-center">
-                                        <custom-button 
-                                            onclick="this.closest('admin-promotions').deletePromotion(${promo.id})"
-                                            text="ลบ"
-                                            hoverBg="red-600"
-                                            color="red-500"
-                                            class="w-full">
-                                        </custom-button>
+                                <tr>
+                                    <td class="py-3 px-6"><img src="/mali-clear-clinic/assets/images/${promo.image}" class="w-20 h-20"></td>
+                                    <td class="py-3 px-6">${promo.title}</td>
+                                    <td class="py-3 px-6">${promo.description}</td>
+                                    <td class="py-3 px-6">
+                                        <button onclick="this.closest('admin-promotions').deletePromotion(${promo.id})" class="bg-red-500 text-white py-2 px-4 rounded">ลบ</button>
                                     </td>
                                 </tr>
                             `).join('')}
@@ -170,4 +101,4 @@ class AdminPromotions extends HTMLElement {
     }
 }
 
-customElements.define('admin-promotions', AdminPromotions); 
+customElements.define('admin-promotions', AdminPromotions);
