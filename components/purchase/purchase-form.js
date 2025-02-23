@@ -59,11 +59,14 @@ class PurchaseForm extends HTMLElement {
         const productData = this.product.data;
         
         this.innerHTML = `
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">ซื้อสินค้า</h2>
             <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
                 <div class="flex gap-6">
-                    <img src="/mali-clear-clinic/assets/images/${productData.image}" 
-                         alt="${productData.name}"
-                         class="w-40 h-40 object-cover rounded">
+                    <img src="/mali-clear-clinic/assets/images/upload/${productData.image}" 
+                        alt="${productData.name}"
+                        class="w-40 h-40 object-cover rounded"
+                        onerror="this.onerror=null;this.src='/mali-clear-clinic/assets/images/default-image.jpg';"
+                    >
                     
                     <div class="flex-1">
                         <h1 class="text-2xl font-semibold mb-2">${productData.name}</h1>

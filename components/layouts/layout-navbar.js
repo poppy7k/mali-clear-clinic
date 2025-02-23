@@ -74,11 +74,11 @@ class CustomNavbar extends HTMLElement {
                         <div class="flex-grow border-t border-gray-300"></div>
                     </div>
                     <ul class="py-2">
-                        ${await this.renderNavItem("/mali-clear-clinic/pages/my-booking.html", "My Bookings", "bookings.html", "h-5 w-5", "p-1")}
+                        ${await this.renderNavItem("/mali-clear-clinic/pages/my-booking.html", "การจองของฉัน", "bookings.html", "h-5 w-5", "p-1")}
                         <li class="px-1 py-2 rounded-md hover:bg-gray-100 hover:text-black cursor-pointer">
                             <button id="logout-btn" class="px-1 flex text-sm text-gray-600 flex items-center gap-2 cursor-pointer">
                                 ${await this.loadIcon("logout.html", "h-6 w-6 text-red-500", "px-1")}
-                                <span class="text-red-500">Logout</span>
+                                <span class="text-red-500">ออกจากระบบ</span>
                             </a>
                         </li>
                     </ul>
@@ -91,7 +91,7 @@ class CustomNavbar extends HTMLElement {
         return `
             <div class="relative flex py-0 items-center">
                 <div class="flex-grow border-t border-gray-300"></div>
-                <span class="flex-shrink mx-2 text-gray-400 font-semibold text-sm">Admin</span>
+                <span class="flex-shrink mx-2 text-gray-400 font-semibold text-sm">จัดการระบบ</span>
                 <div class="flex-grow border-t border-gray-300"></div>
             </div>
             ${await this.renderAdminLinks()}
@@ -100,8 +100,8 @@ class CustomNavbar extends HTMLElement {
 
     async renderAdminLinks() {
         return `
-            ${await this.renderNavItem("/mali-clear-clinic/pages/admin-booking.html", "Bookings", "bookings.html", "h-5 w-5", "p-1")}
-            ${await this.renderNavItem("/mali-clear-clinic/pages/admin-promotions.html", "Promotions", "promo.html", "h-5 w-5", "p-1")}
+            ${await this.renderNavItem("/mali-clear-clinic/pages/admin-booking.html", "การจอง", "bookings.html", "h-5 w-5", "p-1")}
+            ${await this.renderNavItem("/mali-clear-clinic/pages/admin-promotions.html", "โปรโมชั่น", "promo.html", "h-5 w-5", "p-1")}
         `;
     }
 

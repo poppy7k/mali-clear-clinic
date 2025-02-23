@@ -14,16 +14,23 @@ $user->password = $_POST['password'] ?? '';
 
 // ตรวจสอบอีเมลและรหัสผ่าน
 if ($user->login()) {
-    // ดึง role จาก Database
-    $stmt = $db->prepare("SELECT role FROM users WHERE id = ?");
+    // ดึงข้อมูลผู้ใช้จากฐานข้อมูล
+    $stmt = $db->prepare("SELECT full_name, phone, address, role FROM users WHERE id = ?");
     $stmt->execute([$user->id]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $user->full_name = $result['full_name'] ?? null;
+    $user->phone = $result['phone'] ?? null;
+    $user->address = $result['address'] ?? null;
     $user->role = $result['role'];
 
     // เก็บข้อมูล session
     $_SESSION['user_id'] = $user->id;
     $_SESSION['username'] = $user->username;
     $_SESSION['email'] = $user->email;
+    $_SESSION['full_name'] = $user->full_name;
+    $_SESSION['phone'] = $user->phone;
+    $_SESSION['address'] = $user->address;
     $_SESSION['role'] = $user->role;
 
     session_regenerate_id(false);
@@ -36,6 +43,9 @@ if ($user->login()) {
             "user_id" => $user->id,
             "username" => $user->username,
             "email" => $user->email,
+            "full_name" => $user->full_name,
+            "phone" => $user->phone,
+            "address" => $user->address,
             "role" => $user->role
         ]
     ]);

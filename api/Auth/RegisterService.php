@@ -1,5 +1,5 @@
 <?php
-header("Content-Type: application/json"); // กำหนดให้ Response เป็น JSON
+header("Content-Type: application/json");
 require_once '../../Models/User.php';
 require_once '../../Models/Database.php';
 
@@ -11,6 +11,9 @@ $user = new User($db);
 $user->username = $_POST['username'] ?? '';
 $user->email = $_POST['email'] ?? '';
 $user->password = password_hash($_POST['password'] ?? '', PASSWORD_DEFAULT);
+$user->full_name = $_POST['full_name'] ?? null; // ✅ รองรับ NULL
+$user->phone = $_POST['phone'] ?? null; // ✅ รองรับ NULL
+$user->address = $_POST['address'] ?? null; // ✅ รองรับ NULL
 
 // ตรวจสอบอีเมลซ้ำ
 if ($user->emailExists()) {
