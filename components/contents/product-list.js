@@ -55,7 +55,7 @@ class ProductServiceList extends HTMLElement {
     renderFilters() {
         this.innerHTML = `
             <div class="container mx-auto py-2">
-                <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Our Products and Services</h2>
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">สินค้าและบริการ</h2>
                 <div class="flex gap-6">
                     <div class="w-1/4 bg-white rounded-lg shadow-md p-4">
                         <div class="mb-4">

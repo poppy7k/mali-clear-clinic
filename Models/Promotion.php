@@ -9,6 +9,7 @@ class Promotion {
     public $title;
     public $description;
     public $image;
+    public $product_ids;
     public $created_at;
 
     public static $schema = [
@@ -16,6 +17,7 @@ class Promotion {
         "title" => "VARCHAR(100) NOT NULL",
         "description" => "TEXT",
         "image" => "VARCHAR(255)",
+        "product_ids" => "TEXT",
         "created_at" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
     ];
 
@@ -55,12 +57,19 @@ class Promotion {
     }
 
     public function create() {
-        $query = "INSERT INTO " . $this->table_name . " (title, description, image) VALUES (:title, :description, :image)";
+        $query = "INSERT INTO " . $this->table_name . " 
+                 (title, description, image, product_ids) 
+                 VALUES (:title, :description, :image, :product_ids)";
+        
         $stmt = $this->conn->prepare($query);
+        
+        // แปลง array เป็น JSON string
+        $product_ids_json = !empty($this->product_ids) ? json_encode($this->product_ids) : null;
         
         $stmt->bindParam(':title', $this->title);
         $stmt->bindParam(':description', $this->description);
         $stmt->bindParam(':image', $this->image);
+        $stmt->bindParam(':product_ids', $product_ids_json);
         
         return $stmt->execute();
     }
@@ -80,6 +89,57 @@ class Promotion {
         $query = "DELETE FROM " . $this->table_name . " WHERE id = ?";
         $stmt = $this->conn->prepare($query);
         return $stmt->execute([$id]);
+    }
+
+    public function getPromotionById($id) {
+        try {
+            $query = "SELECT * FROM " . $this->table_name . " WHERE id = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$id]);
+            $promotion = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$promotion) {
+                return false;
+            }
+
+            // แปลง product_ids เป็น array และดึงข้อมูลสินค้า
+            if (!empty($promotion['product_ids'])) {
+                $product_ids = json_decode($promotion['product_ids'], true);
+                if ($product_ids) {
+                    $placeholders = str_repeat('?,', count($product_ids) - 1) . '?';
+                    $items_query = "SELECT id, name, price, type FROM products WHERE id IN ($placeholders)";
+                    $stmt = $this->conn->prepare($items_query);
+                    $stmt->execute($product_ids);
+                    $promotion['items'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                }
+            }
+
+            $promotion['items'] = $promotion['items'] ?? [];
+            return $promotion;
+
+        } catch (PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updateProducts($id, $product_ids) {
+        try {
+            $query = "UPDATE " . $this->table_name . " 
+                     SET product_ids = :product_ids 
+                     WHERE id = :id";
+            
+            $stmt = $this->conn->prepare($query);
+            $product_ids_json = json_encode($product_ids);
+            
+            $stmt->bindParam(':product_ids', $product_ids_json);
+            $stmt->bindParam(':id', $id);
+            
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+            return false;
+        }
     }
 }
 ?> 

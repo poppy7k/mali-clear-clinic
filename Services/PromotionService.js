@@ -52,4 +52,15 @@ export class PromotionService {
             return { status: 'error', message: error.message };
         }
     }
+
+    // ✅ ดึงข้อมูลโปรโมชั่นตาม ID
+    static async getPromotionById(id) {
+        try {
+            const response = await fetch(`/mali-clear-clinic/api/promotion/Promotion.php?id=${id}`);
+            return await this.handleResponse(response);
+        } catch (error) {
+            console.error('Error fetching promotion:', error);
+            throw error;
+        }
+    }
 }

@@ -44,28 +44,22 @@ if ($method === 'GET') {
 }
 
 if ($method === 'POST') {
-    // รับข้อมูลที่ส่งมาจาก client
     $data = json_decode(file_get_contents("php://input"), true);
-
+    
     // ตรวจสอบข้อมูลที่จำเป็น
-    if (!isset($data['name'], $data['description'], $data['price'], $data['image'], $data['category_id'], $data['type'])) {
+    if (!isset($data['name']) || !isset($data['category_id']) || !isset($data['price']) || !isset($data['type'])) {
         echo json_encode(["status" => "error", "message" => "Missing required fields"]);
         exit;
     }
 
-    // ตรวจสอบว่า type ถูกต้อง
-    if (!in_array($data['type'], ['PRODUCT', 'SERVICE'])) {
-        echo json_encode(["status" => "error", "message" => "Invalid product type"]);
-        exit;
-    }
-
-    // สร้างผลิตภัณฑ์ใหม่
+    // กำหนดค่าให้กับ object
     $product->name = $data['name'];
-    $product->description = $data['description'];
-    $product->price = $data['price'];
-    $product->image = $data['image'];
     $product->category_id = $data['category_id'];
+    $product->price = $data['price'];
+    $product->description = $data['description'] ?? '';
+    $product->image = $data['image'] ?? '';
     $product->type = $data['type'];
+    $product->status = $data['status'] ?? 'ACTIVE'; // เพิ่ม default status
 
     if ($product->create()) {
         echo json_encode(["status" => "success", "message" => "Product created successfully"]);
@@ -76,29 +70,23 @@ if ($method === 'POST') {
 }
 
 if ($method === 'PUT') {
-    // รับข้อมูลที่ส่งมาจาก client
     $data = json_decode(file_get_contents("php://input"), true);
-
+    
     // ตรวจสอบข้อมูลที่จำเป็น
-    if (!isset($data['id'], $data['name'], $data['description'], $data['price'], $data['image'], $data['category_id'], $data['type'])) {
-        echo json_encode(["status" => "error", "message" => "Missing required fields"]);
+    if (!isset($data['id'])) {
+        echo json_encode(["status" => "error", "message" => "Missing product ID"]);
         exit;
     }
 
-    // ตรวจสอบว่า type ถูกต้อง
-    if (!in_array($data['type'], ['PRODUCT', 'SERVICE'])) {
-        echo json_encode(["status" => "error", "message" => "Invalid product type"]);
-        exit;
-    }
-
-    // อัปเดตข้อมูลผลิตภัณฑ์
+    // กำหนดค่าให้กับ object
     $product->id = $data['id'];
     $product->name = $data['name'];
-    $product->description = $data['description'];
-    $product->price = $data['price'];
-    $product->image = $data['image'];
     $product->category_id = $data['category_id'];
+    $product->price = $data['price'];
+    $product->description = $data['description'] ?? '';
+    $product->image = $data['image'] ?? '';
     $product->type = $data['type'];
+    $product->status = $data['status']; // เพิ่ม status
 
     if ($product->update()) {
         echo json_encode(["status" => "success", "message" => "Product updated successfully"]);
@@ -125,6 +113,29 @@ if ($method === 'DELETE') {
         echo json_encode(["status" => "success", "message" => "Product deleted successfully"]);
     } else {
         echo json_encode(["status" => "error", "message" => "Failed to delete product"]);
+    }
+    exit;
+}
+
+if ($method === 'PATCH') {
+    $data = json_decode(file_get_contents("php://input"), true);
+    
+    if (!isset($data['id']) || !isset($data['status'])) {
+        echo json_encode(["status" => "error", "message" => "Missing required fields"]);
+        exit;
+    }
+
+    // อัปเดตเฉพาะสถานะ
+    $query = "UPDATE products SET status = :status WHERE id = :id";
+    $stmt = $db->prepare($query);
+    
+    if ($stmt->execute([
+        ':id' => $data['id'],
+        ':status' => $data['status']
+    ])) {
+        echo json_encode(["status" => "success", "message" => "Product status updated successfully"]);
+    } else {
+        echo json_encode(["status" => "error", "message" => "Failed to update product status"]);
     }
     exit;
 }

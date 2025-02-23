@@ -1,5 +1,6 @@
 import { getUserSession } from '../../scripts/auth/userSession.js';
 import { toastManager } from '../../scripts/utils/toast.js';
+import { ProductService } from '../../Services/ProductService.js';
 
 class AdminProductForm extends HTMLElement {
     constructor() {
@@ -32,16 +33,13 @@ class AdminProductForm extends HTMLElement {
 
     async loadProduct(id) {
         try {
-            // TODO: เรียก API เพื่อดึงข้อมูลสินค้า
-            this.product = {
-                id: id,
-                name: "ทรีทเมนต์หน้าใส",
-                type: "SERVICE",
-                price: 1500,
-                status: "ACTIVE",
-                description: "รายละเอียดบริการ",
-                image: "treatment.jpg"
-            };
+            const result = await ProductService.getProductById(id);
+            if (result) {
+                this.product = result;
+            } else {
+                toastManager.addToast('error', 'ข้อผิดพลาด', 'ไม่พบข้อมูลสินค้า');
+                window.location.href = '/mali-clear-clinic/pages/admin-products.html';
+            }
         } catch (error) {
             console.error('Error loading product:', error);
             toastManager.addToast('error', 'ข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลสินค้าได้');
@@ -167,21 +165,27 @@ class AdminProductForm extends HTMLElement {
             }
 
             const productId = this.querySelector('#product-id').value;
+            let result;
             
-            // TODO: เรียก API เพื่อบันทึกข้อมูล
-            console.log('Saving product:', formData);
+            if (productId) {
+                result = await ProductService.updateProduct(productId, formData);
+            } else {
+                result = await ProductService.createProduct(formData);
+            }
 
-            toastManager.addToast(
-                'success',
-                'สำเร็จ',
-                productId ? 'แก้ไขข้อมูลเรียบร้อยแล้ว' : 'เพิ่มข้อมูลเรียบร้อยแล้ว'
-            );
-
-            // กลับไปหน้าจัดการสินค้า
-            window.location.href = '/mali-clear-clinic/pages/admin-products.html';
+            if (result.status === 'success') {
+                toastManager.addToast(
+                    'success',
+                    'สำเร็จ',
+                    productId ? 'แก้ไขข้อมูลเรียบร้อยแล้ว' : 'เพิ่มข้อมูลเรียบร้อยแล้ว'
+                );
+                window.location.href = '/mali-clear-clinic/pages/admin-products.html';
+            } else {
+                throw new Error(result.message || 'เกิดข้อผิดพลาด');
+            }
         } catch (error) {
             console.error('Error saving product:', error);
-            toastManager.addToast('error', 'ข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้');
+            toastManager.addToast('error', 'ข้อผิดพลาด', error.message || 'ไม่สามารถบันทึกข้อมูลได้');
         }
     }
 

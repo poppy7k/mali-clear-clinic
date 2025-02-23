@@ -25,45 +25,30 @@ class PurchaseHistory extends HTMLElement {
 
     render() {
         this.innerHTML = `
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h1 class="text-2xl font-bold text-gray-900 mb-6">ประวัติการซื้อสินค้า</h1>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        วันที่
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        รายการ
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        จำนวน
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        ราคารวม
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        สถานะ
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        การชำระเงิน
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id="purchase-list" class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                                        กำลังโหลดข้อมูล...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="container mx-auto p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">ประวัติการซื้อสินค้าทั้งหมด</h2>
+                </div>
+
+                <div class="overflow-x-auto bg-white border border-gray-200 shadow-md rounded-lg p-4">
+                    <table class="w-full border-collapse">
+                        <thead class="border-b border-gray-200">
+                            <tr class="text-gray-800 font-semibold">
+                                <th class="p-3 text-left">วันที่</th>
+                                <th class="p-3 text-left">รายการ</th>
+                                <th class="p-3 text-left">จำนวน</th>
+                                <th class="p-3 text-left">ราคารวม</th>
+                                <th class="p-3 text-left">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchase-list">
+                            <tr><td colspan="7" class="p-4 text-center">กำลังโหลด...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
+            
+            <confirmation-modal></confirmation-modal>
         `;
     }
 
@@ -138,15 +123,6 @@ class PurchaseHistory extends HTMLElement {
                         ${this.getStatusStyle(purchase.status)}">
                         ${this.getStatusText(purchase.status)}
                     </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${this.getPaymentStatusStyle(purchase.paymentStatus)}">
-                        ${this.getPaymentStatusText(purchase.paymentStatus)}
-                    </span>
-                    <div class="text-xs text-gray-500 mt-1">
-                        ${this.getPaymentMethodText(purchase.paymentMethod)}
-                    </div>
                 </td>
             </tr>
         `).join('');

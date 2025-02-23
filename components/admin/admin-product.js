@@ -1,11 +1,13 @@
 import { getUserSession } from '../../scripts/auth/userSession.js';
 import { toastManager } from '../../scripts/utils/toast.js';
+import { ProductService } from '../../Services/ProductService.js';
 
 class AdminProduct extends HTMLElement {
     constructor() {
         super();
         this.products = [];
         this.confirmationModal = null;
+        this.loadingModal = null;
     }
 
     async connectedCallback() {
@@ -16,27 +18,27 @@ class AdminProduct extends HTMLElement {
                 return;
             }
 
-            await this.initializeConfirmationModal();
+            await this.initializeModals();
             this.render();
             this.setupEventListeners();
-            this.loadProducts();
-            this.confirmationModal = this.querySelector('confirmation-modal');
+            await this.loadProducts();
         } catch (error) {
             console.error('Error:', error);
         }
     }
 
-    async initializeConfirmationModal() {
-        return new Promise((resolve) => {
-            this.confirmationModal = document.createElement('confirmation-modal');
-            document.body.appendChild(this.confirmationModal);
+    async initializeModals() {
+        // สร้าง confirmation modal
+        this.confirmationModal = document.createElement('confirmation-modal');
+        
+        // สร้าง loading modal
+        this.loadingModal = document.createElement('loading-modal');
+        
+        document.body.appendChild(this.confirmationModal);
+        document.body.appendChild(this.loadingModal);
 
-            if (this.confirmationModal.isConnected) {
-                resolve();
-            } else {
-                this.confirmationModal.addEventListener('connected', resolve, { once: true });
-            }
-        });
+        // รอให้ modal ถูกเพิ่มเข้าไปใน DOM
+        await new Promise(resolve => setTimeout(resolve, 0));
     }
 
     render() {
@@ -86,22 +88,15 @@ class AdminProduct extends HTMLElement {
 
     async loadProducts() {
         try {
-            // TODO: เรียก API เพื่อดึงข้อมูลสินค้า
-            const products = [
-                {
-                    id: 1,
-                    name: "ทรีทเมนต์หน้าใส",
-                    type: "SERVICE",
-                    price: 1500,
-                    status: "ACTIVE",
-                    image: "treatment.jpg"
-                }
-            ];
+            this.loadingModal.show();
+            const products = await ProductService.getAllProducts();
             this.products = products;
             this.renderProductsTable();
         } catch (error) {
             console.error('Error loading products:', error);
             toastManager.addToast('error', 'ข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลสินค้าได้');
+        } finally {
+            this.loadingModal.hide();
         }
     }
 
@@ -120,13 +115,15 @@ class AdminProduct extends HTMLElement {
                     <td class="p-3">${product.type === 'SERVICE' ? 'บริการ' : 'สินค้า'}</td>
                     <td class="p-3">${product.price.toLocaleString()} บาท</td>
                     <td class="p-3">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            product.status === 'ACTIVE' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }">
+                        <button 
+                            class="status-toggle-btn px-3 py-1 rounded-full text-sm font-semibold
+                            ${product.status === 'ACTIVE' 
+                                ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                                : 'bg-red-100 text-red-800 hover:bg-red-200'}"
+                            data-id="${product.id}"
+                            data-status="${product.status}">
                             ${product.status === 'ACTIVE' ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
-                        </span>
+                        </button>
                     </td>
                     <td class="p-3">
                         <button onclick="window.location.href='/mali-clear-clinic/pages/admin-product-form.html?id=${product.id}'" 
@@ -140,6 +137,11 @@ class AdminProduct extends HTMLElement {
                 </tr>
             `).join("")
             : "<tr><td colspan='6' class='p-4 text-center'>ไม่พบข้อมูลสินค้าและบริการ</td></tr>";
+
+        // เพิ่ม event listeners สำหรับปุ่มเปลี่ยนสถานะ
+        this.querySelectorAll('.status-toggle-btn').forEach(btn => {
+            btn.addEventListener('click', () => this.toggleStatus(btn));
+        });
 
         // เพิ่ม event listeners สำหรับปุ่มลบ
         this.querySelectorAll('.delete-btn').forEach(btn => {
@@ -249,26 +251,49 @@ class AdminProduct extends HTMLElement {
         const productToDelete = this.products.find(p => p.id === parseInt(id));
         if (!productToDelete) return;
 
-        if (!this.confirmationModal?.open) {
-            console.error('❌ Confirmation modal is not ready');
-            return;
-        }
-
         this.confirmationModal.open(
             'ยืนยันการลบ',
             `คุณต้องการลบ "${productToDelete.name}" ใช่หรือไม่?`,
             async () => {
                 try {
-                    // TODO: เรียก API เพื่อลบข้อมูล
-                    console.log('Deleting product:', id);
-                    toastManager.addToast('success', 'สำเร็จ', 'ลบข้อมูลเรียบร้อยแล้ว');
-                    this.loadProducts();
+                    this.loadingModal.show();
+                    const result = await ProductService.deleteProduct(id);
+                    if (result.status === 'success') {
+                        toastManager.addToast('success', 'สำเร็จ', 'ลบข้อมูลเรียบร้อยแล้ว');
+                        await this.loadProducts();
+                    } else {
+                        throw new Error(result.message || 'เกิดข้อผิดพลาด');
+                    }
                 } catch (error) {
                     console.error('Error deleting product:', error);
-                    toastManager.addToast('error', 'ข้อผิดพลาด', 'ไม่สามารถลบข้อมูลได้');
+                    toastManager.addToast('error', 'ข้อผิดพลาด', error.message || 'ไม่สามารถลบข้อมูลได้');
+                } finally {
+                    this.loadingModal.hide();
                 }
             }
         );
+    }
+
+    async toggleStatus(button) {
+        const id = button.dataset.id;
+        const currentStatus = button.dataset.status;
+        const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+        
+        try {
+            this.loadingModal.show();
+            const result = await ProductService.updateStatus(id, newStatus);
+            if (result.status === 'success') {
+                toastManager.addToast('success', 'สำเร็จ', 'อัปเดตสถานะเรียบร้อยแล้ว');
+                await this.loadProducts();
+            } else {
+                throw new Error(result.message || 'เกิดข้อผิดพลาด');
+            }
+        } catch (error) {
+            console.error('Error toggling status:', error);
+            toastManager.addToast('error', 'ข้อผิดพลาด', error.message || 'ไม่สามารถอัปเดตสถานะได้');
+        } finally {
+            this.loadingModal.hide();
+        }
     }
 }
 

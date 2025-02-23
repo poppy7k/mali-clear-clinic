@@ -46,58 +46,82 @@ class AdminPromotions extends HTMLElement {
         }
     }
 
+    async editPromotion(id) {
+        window.location.href = `/mali-clear-clinic/pages/admin-promotion-form.html?id=${id}`;
+    }
+
     render() {
         this.innerHTML = `
-            <div class="container mx-auto px-4 py-8">
-                <h2 class="text-2xl font-bold mb-6">จัดการโปรโมชั่น</h2>
+            <div class="container mx-auto p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">จัดการโปรโมชั่น</h2>
+                    <custom-button 
+                        text="เพิ่มโปรโมชั่นใหม่"
+                        color="white"
+                        bgColor="green-600"
+                        hoverBg="green-500"
+                        icon=""
+                        id="add-promotion-btn"
+                        class="w-auto">
+                    </custom-button>
+                </div>
 
-                <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onsubmit="this.closest('admin-promotions').handleSubmit(event)">
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">ชื่อโปรโมชั่น</label>
-                        <input type="text" name="title" required class="w-full px-3 py-2 border rounded-lg">
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">รายละเอียด</label>
-                        <textarea name="description" required class="w-full px-3 py-2 border rounded-lg"></textarea>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">รูปภาพ</label>
-                        <input type="file" name="image" accept="image/*" required class="w-full">
-                    </div>
-
-                    <button class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded" type="submit">
-                        เพิ่มโปรโมชั่น
-                    </button>
-                </form>
-
-                <div class="bg-white shadow-md rounded my-6">
-                    <table class="min-w-full">
-                        <thead>
-                            <tr class="bg-gray-200 text-gray-600 uppercase text-sm">
-                                <th class="py-3 px-6">รูปภาพ</th>
-                                <th class="py-3 px-6">ชื่อโปรโมชั่น</th>
-                                <th class="py-3 px-6">รายละเอียด</th>
-                                <th class="py-3 px-6">จัดการ</th>
+                <div class="overflow-x-auto bg-white border border-gray-200 shadow-md rounded-lg p-4">
+                    <table class="w-full border-collapse">
+                        <thead class="border-b border-gray-200">
+                            <tr class="text-gray-800 font-semibold">
+                                <th class="p-3 text-left">รูปภาพ</th>
+                                <th class="p-3 text-left">ชื่อโปรโมชั่น</th>
+                                <th class="p-3 text-left">รายละเอียด</th>
+                                <th class="p-3 text-left">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${this.promotions.map(promo => `
-                                <tr>
-                                    <td class="py-3 px-6"><img src="/mali-clear-clinic/assets/images/${promo.image}" class="w-20 h-20"></td>
-                                    <td class="py-3 px-6">${promo.title}</td>
-                                    <td class="py-3 px-6">${promo.description}</td>
-                                    <td class="py-3 px-6">
-                                        <button onclick="this.closest('admin-promotions').deletePromotion(${promo.id})" class="bg-red-500 text-white py-2 px-4 rounded">ลบ</button>
+                            ${this.promotions.length > 0 ? this.promotions.map(promo => `
+                                <tr class="border-b border-gray-200 text-gray-700">
+                                    <td class="p-3">
+                                        <img src="/mali-clear-clinic/assets/images/${promo.image}" 
+                                             alt="${promo.title}"
+                                             class="h-16 w-16 object-cover rounded-lg"
+                                             onerror="this.onerror=null;this.src='/mali-clear-clinic/assets/images/default-image.jpg';">
+                                    </td>
+                                    <td class="p-3">
+                                        <div class="font-medium">${promo.title}</div>
+                                    </td>
+                                    <td class="p-3">
+                                        <div class="text-sm text-gray-500">${promo.description}</div>
+                                    </td>
+                                    <td class="p-3">
+                                        <div class="flex gap-4">
+                                            <button onclick="this.closest('admin-promotions').editPromotion(${promo.id})" 
+                                                    class="text-blue-600 hover:text-blue-900">
+                                                แก้ไข
+                                            </button>
+                                            <button onclick="this.closest('admin-promotions').deletePromotion(${promo.id})" 
+                                                    class="text-red-600 hover:text-red-900">
+                                                ลบ
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
-                            `).join('')}
+                            `).join('') : `
+                                <tr>
+                                    <td colspan="4" class="p-4 text-center">ไม่พบข้อมูลโปรโมชั่น</td>
+                                </tr>
+                            `}
                         </tbody>
                     </table>
                 </div>
             </div>
         `;
+
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+        this.querySelector('#add-promotion-btn').addEventListener('click', () => {
+            window.location.href = '/mali-clear-clinic/pages/admin-promotion-form.html';
+        });
     }
 }
 

@@ -39,15 +39,37 @@ if ($method === 'POST') {
 }
 
 if ($method === 'GET') {
-    if (isset($_GET["id"])) {
-        $promotion_id = $_GET["id"];
-        $stmt = $db->prepare("SELECT * FROM promotions WHERE id = ?");
-        $stmt->execute([$promotion_id]);
-        echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
-    } else {
-        $promotions = $promotion->getAllPromotions();
-        echo json_encode(["status" => "success", "data" => $promotions]);
+    $id = isset($_GET['id']) ? $_GET['id'] : null;
+    
+    if ($id) {
+        // ดึงข้อมูลโปรโมชั่นตาม ID
+        $sql = "SELECT * FROM promotions WHERE id = ?";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$id]);
+        $promotion = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($promotion) {
+            // เพิ่ม items เป็น array ว่าง (สำหรับรองรับโครงสร้างข้อมูลในอนาคต)
+            $promotion['items'] = [];
+            
+            echo json_encode(["status" => "success", "data" => $promotion]);
+        } else {
+            echo json_encode(["status" => "error", "message" => "ไม่พบโปรโมชั่นที่ต้องการ"]);
+        }
+        exit;
     }
+    
+    // ถ้าไม่มี ID ให้ดึงข้อมูลทั้งหมดตามเดิม
+    $sql = "SELECT * FROM promotions";
+    $result = $db->query($sql);
+    
+    $promotions = [];
+    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        $promotions[] = $row;
+    }
+    
+    echo json_encode(["status" => "success", "data" => $promotions]);
     exit;
 }
 

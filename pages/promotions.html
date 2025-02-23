@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โปรโมชั่น - Mali Clear Clinic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/mali-clear-clinic/styles/main.css">
+</head>
+<body class="bg-gray-100">
+    <layout-navbar></layout-navbar>
+    
+    <!-- Hero Section -->
+    <div class="bg-blue-600 text-white py-16">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl font-bold text-center mb-4">โปรโมชั่นพิเศษ</h1>
+            <p class="text-center text-xl opacity-90">ข้อเสนอสุดพิเศษและสิทธิประโยชน์มากมายสำหรับคุณ</p>
+        </div>
+    </div>
+
+    <!-- Promotions List -->
+    <content-promotions></content-promotions>
+
+    <script type="module" src="../components/layouts/layout-navbar.js"></script>
+    <script type="module" src="/mali-clear-clinic/components/contents/content-promotions.js"></script>
+    <script type="module" src="/mali-clear-clinic/components/buttons/custom-button.js"></script>
+</body>
+</html> 

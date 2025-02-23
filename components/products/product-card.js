@@ -40,7 +40,7 @@ class ProductCard extends HTMLElement {
 
                 <div class="p-4">
                     <h3 class="text-xl font-semibold mb-2">${this.product.name}</h3>
-                    <p class="text-gray-600 mb-4">${this.product.description}</p>
+                    <p class="text-gray-600 max-w-96 truncate mb-4">${this.product.description}</p>
                     <div class="flex justify-between items-center gap-10">
                         <span class="text-lg font-bold text-green-600">฿${this.product.price}</span>
                         ${this.renderActionButton()}

@@ -40,4 +40,90 @@ export class ProductService {
             return null;
         }
     }    
+
+    static async createProduct(formData) {
+        try {
+            const response = await fetch('/mali-clear-clinic/api/product/Product.php', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to create product');
+            }
+            
+            const result = await response.json();
+            return result;
+        } catch (error) {
+            console.error('Error creating product:', error);
+            throw error;
+        }
+    }
+
+    static async updateProduct(id, formData) {
+        try {
+            formData.append('id', id);
+            const response = await fetch('/mali-clear-clinic/api/product/Product.php', {
+                method: 'PUT',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to update product');
+            }
+            
+            const result = await response.json();
+            return result;
+        } catch (error) {
+            console.error('Error updating product:', error);
+            throw error;
+        }
+    }
+
+    static async deleteProduct(id) {
+        try {
+            const response = await fetch('/mali-clear-clinic/api/product/Product.php', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to delete product');
+            }
+            
+            const result = await response.json();
+            return result;
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            throw error;
+        }
+    }
+
+    static async updateStatus(id, status) {
+        try {
+            const response = await fetch('/mali-clear-clinic/api/product/Product.php', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    id,
+                    status
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to update product status');
+            }
+            
+            const result = await response.json();
+            return result;
+        } catch (error) {
+            console.error('Error updating product status:', error);
+            throw error;
+        }
+    }
 }

@@ -13,6 +13,7 @@ class Product {
     public $description;
     public $image;
     public $type;
+    public $status;
     public $created_at;
 
     public static $schema = [
@@ -23,6 +24,7 @@ class Product {
         "image" => "VARCHAR(255)",
         "description" => "TEXT",
         "type" => "ENUM('PRODUCT', 'SERVICE') NOT NULL",
+        "status" => "ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE'",
         "created_at" => "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
         "CONSTRAINT fk_products_category" => "FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE"
     ];
@@ -41,9 +43,9 @@ class Product {
     public function create() {
         try {
             $query = "INSERT INTO " . $this->table_name . " 
-                     (category_id, name, price, description, image, type) 
+                     (category_id, name, price, description, image, type, status) 
                      VALUES 
-                     (:category_id, :name, :price, :description, :image, :type)";
+                     (:category_id, :name, :price, :description, :image, :type, :status)";
             
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':category_id', $this->category_id);
@@ -52,6 +54,7 @@ class Product {
             $stmt->bindParam(':description', $this->description);
             $stmt->bindParam(':image', $this->image);
             $stmt->bindParam(':type', $this->type);
+            $stmt->bindParam(':status', $this->status);
     
             if ($stmt->execute()) {
                 return true;
@@ -66,7 +69,9 @@ class Product {
     }    
 
     public function getAllProducts() {
-        $query = "SELECT * FROM " . $this->table_name;
+        $query = "SELECT p.*, c.name as category_name 
+                 FROM " . $this->table_name . " p 
+                 LEFT JOIN categories c ON p.category_id = c.id";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -75,7 +80,10 @@ class Product {
     }
     
     public function getProductsByType($type) {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE type = :type";
+        $query = "SELECT p.*, c.name as category_name 
+                 FROM " . $this->table_name . " p 
+                 LEFT JOIN categories c ON p.category_id = c.id 
+                 WHERE p.type = :type";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":type", $type);
         $stmt->execute();
@@ -126,7 +134,8 @@ class Product {
                      price = :price, 
                      description = :description, 
                      image = :image,
-                     type = :type 
+                     type = :type,
+                     status = :status 
                  WHERE id = :id";
 
         $stmt = $this->conn->prepare($query);
@@ -138,6 +147,7 @@ class Product {
         $stmt->bindParam(':description', $this->description);
         $stmt->bindParam(':image', $this->image);
         $stmt->bindParam(':type', $this->type);
+        $stmt->bindParam(':status', $this->status);
 
         return $stmt->execute();
     }
