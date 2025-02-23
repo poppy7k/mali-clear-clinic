@@ -1,5 +1,6 @@
 import { getUserSession } from '../../scripts/auth/userSession.js';
 import { toastManager } from '../../scripts/utils/toast.js';
+import { BlogService } from '../../Services/BlogService.js';
 
 class AdminBlogForm extends HTMLElement {
     constructor() {
@@ -39,15 +40,7 @@ class AdminBlogForm extends HTMLElement {
 
     async loadBlog(id) {
         try {
-            // TODO: เรียก API เพื่อดึงข้อมูลบล็อก
-            this.blog = {
-                id: parseInt(id),
-                title: "วิธีดูแลผิวหน้าให้ใส",
-                content: "<p>เนื้อหาบล็อก...</p>",
-                image: "blog1.jpg",
-                excerpt: "เคล็ดลับการดูแลผิวหน้าให้ใสอย่างเป็นธรรมชาติ",
-                status: "published"
-            };
+            this.blog = await BlogService.getBlogById(id);
         } catch (error) {
             console.error('Error loading blog:', error);
             toastManager.addToast('error', 'ข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลบล็อกได้');
@@ -183,24 +176,43 @@ class AdminBlogForm extends HTMLElement {
         e.preventDefault();
         
         try {
-            const formData = new FormData();
-            formData.append('title', this.querySelector('#title').value);
-            formData.append('excerpt', this.querySelector('#excerpt').value);
-            formData.append('content', this.querySelector('rich-text-editor').getContent());
-            formData.append('status', this.querySelector('#status').value);
+            const titleInput = this.querySelector('#title');
+            const excerptInput = this.querySelector('#excerpt');
 
-            const imageFile = this.querySelector('#image').files[0];
-            if (imageFile) {
-                formData.append('image', imageFile);
+            const title = titleInput?.querySelector('input')?.value || titleInput?.value || "";
+            const excerpt = excerptInput?.querySelector('textarea')?.value || excerptInput?.value || "";
+            const content = this.querySelector('rich-text-editor').getContent();
+            const status = this.querySelector('#status').value;
+
+            if (!title || !excerpt || !content || !status) {
+                throw new Error('Missing required fields');
+            }
+
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('excerpt', excerpt);
+            formData.append('content', content);
+            formData.append('status', status);
+
+            const imageInput = this.querySelector('#image');
+            if (imageInput && imageInput.files?.length > 0) {
+                formData.append('image', imageInput.files[0]);
             }
 
             const blogId = this.querySelector('#blog-id').value;
             if (blogId) {
                 formData.append('id', blogId);
+                formData.append('_method', 'PUT');
             }
 
-            // TODO: เรียก API เพื่อบันทึกข้อมูล
-            console.log('Saving blog:', Object.fromEntries(formData));
+            // Debug: แสดงรายการทั้งหมดใน FormData
+            console.log('FormData entries:', Array.from(formData.entries()));
+
+            if (blogId) {
+                await BlogService.updateBlog(blogId, formData);
+            } else {
+                await BlogService.createBlog(formData);
+            }
 
             toastManager.addToast(
                 'success',
@@ -211,7 +223,7 @@ class AdminBlogForm extends HTMLElement {
             this.navigateBack();
         } catch (error) {
             console.error('Error saving blog:', error);
-            toastManager.addToast('error', 'ข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้');
+            toastManager.addToast('error', 'ข้อผิดพลาด', error.message || 'ไม่สามารถบันทึกข้อมูลได้');
         }
     }
 }

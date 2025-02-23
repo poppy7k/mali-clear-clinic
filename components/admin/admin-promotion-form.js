@@ -114,6 +114,11 @@ class AdminPromotionForm extends HTMLElement {
     
         try {
             const formData = new FormData(event.target);
+
+            formData.append('title', this.querySelector('form-input[name="title"] input')?.value || '');
+            formData.append('excerpt', this.querySelector('form-input[name="excerpt"] textarea')?.value || '');
+            formData.append('content', this.querySelector('rich-text-editor').getContent());
+            formData.append('status', this.querySelector('#status').value);
     
             // ✅ เช็คว่ามีรูปภาพหรือไม่
             const imageInput = this.querySelector("input[name='image']");

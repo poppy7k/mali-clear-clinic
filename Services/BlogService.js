@@ -70,14 +70,13 @@ class BlogService {
 
     static async updateBlog(id, blogData) {
         try {
-            blogData.id = id;
+            // Debug: แสดงรายการทั้งหมดใน FormData
+            console.log('FormData entries before sending:', Array.from(blogData.entries()));
+
             const response = await fetch('/mali-clear-clinic/api/blog/Blog.php', {
-                method: 'PUT',
+                method: 'POST',
                 credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(blogData)
+                body: blogData
             });
 
             const data = await response.json();
