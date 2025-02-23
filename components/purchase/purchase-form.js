@@ -65,7 +65,7 @@ class PurchaseForm extends HTMLElement {
                     <img src="/mali-clear-clinic/assets/images/upload/${productData.image}" 
                         alt="${productData.name}"
                         class="w-40 h-40 object-cover rounded"
-                        onerror="this.onerror=null;this.src='/mali-clear-clinic/assets/images/default-image.jpg';"
+                        onerror="this.onerror=null;this.src='/mali-clear-clinic/assets/images/DD.jpg';"
                     >
                     
                     <div class="flex-1">

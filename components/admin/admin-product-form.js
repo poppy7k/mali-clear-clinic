@@ -89,10 +89,9 @@ class AdminProductForm extends HTMLElement {
                             </div>
                         </div>
 
-                        <div>
+                        <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1">รายละเอียด *</label>
-                            <textarea id="description" required rows="4" 
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md">${this.product?.description || ''}</textarea>
+                            <rich-text-editor id="description"></rich-text-editor>
                         </div>
 
                         <div>
@@ -130,6 +129,16 @@ class AdminProductForm extends HTMLElement {
                 </div>
             </div>
         `;
+
+        // Set initial content if editing
+        if (this.product?.description) {
+            this.querySelector('rich-text-editor').setContent(this.product.description);
+        }
+
+        // Listen for changes
+        this.querySelector('rich-text-editor').addEventListener('editor-change', (e) => {
+            console.log('Editor content changed:', e.detail.html);
+        });
     }
 
     setupEventListeners() {
@@ -150,7 +159,7 @@ class AdminProductForm extends HTMLElement {
             formData.append('type', this.querySelector('#type').value);
             formData.append('price', this.querySelector('#price').value);
             formData.append('status', this.querySelector('#status').value);
-            formData.append('description', this.querySelector('#description').value);
+            formData.append('description', this.querySelector('rich-text-editor').getContent());
 
             const imageFile = this.querySelector('#image').files[0];
             if (imageFile) {

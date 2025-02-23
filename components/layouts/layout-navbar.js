@@ -76,10 +76,11 @@ class CustomNavbar extends HTMLElement {
                     <ul class="py-2">
                         ${await this.renderNavItem("/mali-clear-clinic/pages/profile.html", "โปรไฟล์", "user.html", "h-5 w-5", "p-1")}
                         ${await this.renderNavItem("/mali-clear-clinic/pages/my-booking.html", "การจองของฉัน", "bookings.html", "h-5 w-5", "p-1")}
+                        ${await this.renderNavItem("/mali-clear-clinic/pages/purchase-history.html", "ประวัติการซื้อ", "history.html", "h-5 w-5", "p-1")}
                         <li class="px-1 py-2 rounded-md hover:bg-gray-100 hover:text-black cursor-pointer">
-                            <button id="logout-btn" class="px-1 flex text-sm text-gray-600 flex items-center gap-2 cursor-pointer">
+                            <button id="logout-btn" class="px-1 flex text-sm text-red-500 flex items-center gap-2 cursor-pointer">
                                 ${await this.loadIcon("logout.html", "h-6 w-6 text-red-500", "px-1")}
-                                <span class="text-red-500">ออกจากระบบ</span>
+                                <span>ออกจากระบบ</span>
                             </button>
                         </li>
                     </ul>
@@ -104,6 +105,8 @@ class CustomNavbar extends HTMLElement {
             ${await this.renderNavItem("/mali-clear-clinic/pages/admin-booking.html", "การจอง", "bookings.html", "h-5 w-5", "p-1")}
             ${await this.renderNavItem("/mali-clear-clinic/pages/admin-products.html", "สินค้าและบริการ", "product.html", "h-5 w-5", "p-1")}
             ${await this.renderNavItem("/mali-clear-clinic/pages/admin-promotions.html", "โปรโมชั่น", "promo.html", "h-5 w-5", "p-1")}
+            ${await this.renderNavItem("/mali-clear-clinic/pages/admin-blogs.html", "บล็อก", "blog.html", "h-5 w-5", "p-1")}
+            ${await this.renderNavItem("/mali-clear-clinic/pages/admin-purchase-history.html", "ประวัติการซื้อ", "history.html", "h-5 w-5", "p-1")}
         `;
     }
 
