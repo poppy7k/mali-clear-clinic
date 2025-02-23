@@ -1,5 +1,5 @@
 import { getUserSession } from "/mali-clear-clinic/scripts/auth/userSession.js";
-import BookingService from '../../services/BookingService.js';
+import BookingService from '../../Services/BookingService.js';
 import { handleError } from '../../utils/ErrorHandler.js';
 import { toastManager } from '../../scripts/utils/toast.js';
 

@@ -102,6 +102,7 @@ class CustomNavbar extends HTMLElement {
     async renderAdminLinks() {
         return `
             ${await this.renderNavItem("/mali-clear-clinic/pages/admin-booking.html", "การจอง", "bookings.html", "h-5 w-5", "p-1")}
+            ${await this.renderNavItem("/mali-clear-clinic/pages/admin-products.html", "สินค้าและบริการ", "product.html", "h-5 w-5", "p-1")}
             ${await this.renderNavItem("/mali-clear-clinic/pages/admin-promotions.html", "โปรโมชั่น", "promo.html", "h-5 w-5", "p-1")}
         `;
     }
