@@ -62,7 +62,7 @@ class CustomNavbar extends HTMLElement {
         return `
             <div class="relative">
                 <button id="profile-btn" class="py-2 px-2 rounded-[22px] transition-all duration-300 fill-gray-700 cursor-pointer hover:fill-yellow-400 hover:scale-125">
-                    ${await this.loadIcon("user.html", "h-6 w-6 text-gray-700", "bg-gray-200 p-2 rounded-full")}
+                    ${await this.loadIcon("user.html", "h-5 w-5 text-gray-700", "p-2 rounded-full")}
                 </button>
                 <div id="dropdown" class="absolute right-0 mt-2 w-52 bg-white border border-gray-300 rounded-lg shadow-lg hidden px-4 py-2 z-50">
                     <div class="px-1 pt-1 pb-2">@${user.username}</div>

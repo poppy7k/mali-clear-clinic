@@ -1,17 +1,23 @@
 class CategoryList extends HTMLElement {
     constructor() {
         super();
-        this.selectedCategory = ""; // เก็บค่า category ที่เลือก
-        this.selectedCategoryCallback = null; // เก็บ callback function
+        this.selectedCategory = ""; 
+        this.selectedCategoryCallback = null;
     }
 
     async connectedCallback() {
         this.innerHTML = `
-            <div class="bg-white rounded-lg shadow-sm z-10">
+            <div class="bg-white rounded-lg z-10">
                 <div class="flex flex-col space-y-2">
-                    <button class="category-btn text-left px-4 py-2 rounded transition-colors duration-200 hover:bg-yellow-50 bg-yellow-100 text-yellow-700 font-medium" data-id="">
-                        ทั้งหมด
-                    </button>
+                    <custom-button 
+                        class="category-btn w-full"
+                        text="ทั้งหมด"
+                        color="yellow-700"
+                        bgColor="yellow-100"
+                        hoverBg="yellow-50"
+                        data-id=""
+                        align="left">
+                    </custom-button>
                 </div>
             </div>
         `;
@@ -28,10 +34,15 @@ class CategoryList extends HTMLElement {
             if (data.status === "success") {
                 const container = this.querySelector(".flex-col");
                 data.categories.forEach(category => {
-                    const button = document.createElement("button");
-                    button.className = "category-btn text-left px-4 py-2 rounded transition-colors duration-200 hover:bg-yellow-50 text-gray-600";
-                    button.textContent = category.name;
-                    button.dataset.id = category.id;
+                    if (!category.id) return;
+                    const button = document.createElement("custom-button");
+                    button.className = "category-btn w-full";
+                    button.setAttribute("text", category.name);
+                    button.setAttribute("color", "gray-700");
+                    button.setAttribute("bgColor", "white");
+                    button.setAttribute("hoverBg", "yellow-50");
+                    button.setAttribute("data-id", category.id);
+                    button.setAttribute("align", "left");
                     container.appendChild(button);
                 });
             }
@@ -42,32 +53,38 @@ class CategoryList extends HTMLElement {
 
     addEventListeners() {
         this.addEventListener("click", (event) => {
-            if (event.target.classList.contains("category-btn")) {
-                this.selectedCategory = event.target.dataset.id;
-                console.log("Category selected:", this.selectedCategory);
-                this.updateSelectedCategory();
-
-                // ส่งค่าที่เลือกไปยัง callback function
-                if (this.selectedCategoryCallback) {
-                    this.selectedCategoryCallback(this.selectedCategory);
-                }
+            const clickedButton = event.target.closest("custom-button"); // ค้นหา `custom-button` ที่ใกล้ที่สุด
+            if (!clickedButton) return; // ถ้าไม่ใช่ `custom-button` ให้หยุดทำงาน
+    
+            this.selectedCategory = clickedButton.getAttribute("data-id") || "";
+            console.log("Category selected:", this.selectedCategory);
+            this.updateSelectedCategory();
+    
+            // ส่งค่าที่เลือกไปยัง callback function
+            if (this.selectedCategoryCallback) {
+                this.selectedCategoryCallback(this.selectedCategory);
             }
         });
     }
+    
 
     updateSelectedCategory() {
         this.querySelectorAll(".category-btn").forEach(btn => {
-            if (btn.dataset.id === this.selectedCategory) {
-                btn.classList.remove('text-gray-600');
-                btn.classList.add('bg-yellow-100', 'text-yellow-700', 'font-medium');
+            if (btn.getAttribute("data-id") === this.selectedCategory) {
+                btn.setAttribute("color", "yellow-700");
+                btn.setAttribute("bgColor", "yellow-100");
             } else {
-                btn.classList.remove('bg-yellow-100', 'text-yellow-700', 'font-medium');
-                btn.classList.add('text-gray-600');
+                btn.setAttribute("color", "gray-700");
+                btn.setAttribute("bgColor", "white");
             }
+    
+            // ✅ บังคับให้ปุ่มอัปเดต
+            const newBtn = btn.cloneNode(true);
+            btn.replaceWith(newBtn);
         });
     }
+    
 
-    // ฟังก์ชันสำหรับตั้งค่า callback
     setCategorySelectedCallback(callback) {
         this.selectedCategoryCallback = callback;
     }
