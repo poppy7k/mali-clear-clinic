@@ -22,7 +22,11 @@ class ProductServiceList extends HTMLElement {
     async fetchProducts() {
         try {
             this.setLoadingState();
-            this.products = await ProductService.getAllProducts();
+            const allProducts = await ProductService.getAllProducts();
+            
+            // กรองเฉพาะสินค้าที่มีสถานะ ACTIVE
+            this.products = allProducts.filter(product => product.status === 'ACTIVE');
+            
             this.renderProductGrid();
         } catch (error) {
             console.error("Error fetching products:", error);
