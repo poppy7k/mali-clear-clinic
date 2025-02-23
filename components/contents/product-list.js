@@ -24,8 +24,12 @@ class ProductServiceList extends HTMLElement {
             this.setLoadingState();
             const allProducts = await ProductService.getAllProducts();
             
-            // กรองเฉพาะสินค้าที่มีสถานะ ACTIVE
-            this.products = allProducts.filter(product => product.status === 'ACTIVE');
+            // กรองเฉพาะสินค้าที่มีสถานะ ACTIVE, หมวดหมู่ที่เลือก, และประเภทที่เลือก
+            this.products = allProducts.filter(product => 
+                product.status === 'ACTIVE' && 
+                (this.selectedCategory === "" || product.category_id === this.selectedCategory) &&
+                (this.selectedType === "all" || product.type === this.selectedType)
+            );
             
             this.renderProductGrid();
         } catch (error) {
@@ -121,13 +125,38 @@ class ProductServiceList extends HTMLElement {
     }
 
     setupEventListeners() {
-        this.querySelectorAll('.type-btn').forEach(button => {
+        this.addTypeButtonListeners();
+    }
+
+    addTypeButtonListeners() {
+        this.querySelectorAll('custom-button.type-btn').forEach(button => {
             button.addEventListener('click', (e) => {
                 const type = e.currentTarget.getAttribute('data-type');
                 this.selectedType = type;
+                this.updateTypeButtonStyles();
                 this.fetchProducts();
             });
         });
+    }
+
+    updateTypeButtonStyles() {
+        this.querySelectorAll('custom-button.type-btn').forEach(button => {
+            const type = button.getAttribute('data-type');
+            if (type === this.selectedType) {
+                button.setAttribute('color', 'yellow-700');
+                button.setAttribute('bgColor', 'yellow-100');
+            } else {
+                button.setAttribute('color', 'gray-700');
+                button.setAttribute('bgColor', 'white');
+            }
+
+            // ✅ บังคับให้ปุ่มอัปเดต
+            const newButton = button.cloneNode(true);
+            button.replaceWith(newButton);
+        });
+
+        // ✅ ผูกอีเวนต์ลิสเนอร์ใหม่หลังจากแทนที่ปุ่ม
+        this.addTypeButtonListeners();
     }
 
     setupCategoryObserver() {
