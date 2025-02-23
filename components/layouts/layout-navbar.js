@@ -7,8 +7,8 @@ class CustomNavbar extends HTMLElement {
 
     connectedCallback() {
         this.innerHTML = `
-        <div class="sticky relative top-0">
-            <nav class="items-center w-full z-50 bg-white py-4">
+        <div class="sticky z-50 relative top-0">
+            <nav class="items-center w-full bg-white py-4">
                 <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto">
                     <a href="/mali-clear-clinic/index.html" class="flex items-center space-x-3 rtl:space-x-reverse">
                         <img src="/mali-clear-clinic/assets/images/maliclear-logo.png" class="h-16" alt="Logo">
