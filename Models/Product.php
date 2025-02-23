@@ -1,6 +1,6 @@
 <?php
 require_once 'Database.php';
-require_once(__DIR__ . '/../Seeders/ProductSeeder.php');
+require_once(__DIR__ . '/../Seeders/ProductsSeeder.php');
 
 class Product {
     private $conn;
@@ -35,70 +35,88 @@ class Product {
         $tableManager = new TableManager($this->conn);
         $tableManager->validateAndUpdateTableStructure($this->table_name, self::$schema);
 
-        // ✅ Seed ข้อมูลสินค้า (ถ้ายังไม่มี)
-        $this->seedProducts();
-    }
-
-    private function seedProducts() {
-        // สร้าง object ของ ProductSeeder และรันการเพิ่มข้อมูล
-        $seeder = new ProductSeeder($this->conn);
-        $seeder->seed();
     }
 
     // เพิ่มสินค้าใหม่ (สำหรับ POST)
     public function create() {
-        $query = "INSERT INTO " . $this->table_name . " 
-                 (category_id, name, price, description, image, type) 
-                 VALUES 
-                 (:category_id, :name, :price, :description, :image, :type)";
-        
-        $stmt = $this->conn->prepare($query);
+        try {
+            $query = "INSERT INTO " . $this->table_name . " 
+                     (category_id, name, price, description, image, type) 
+                     VALUES 
+                     (:category_id, :name, :price, :description, :image, :type)";
+            
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':category_id', $this->category_id);
+            $stmt->bindParam(':name', $this->name);
+            $stmt->bindParam(':price', $this->price);
+            $stmt->bindParam(':description', $this->description);
+            $stmt->bindParam(':image', $this->image);
+            $stmt->bindParam(':type', $this->type);
+    
+            if ($stmt->execute()) {
+                return true;
+            } else {
+                error_log("❌ Error creating product: " . print_r($stmt->errorInfo(), true));
+                return false;
+            }
+        } catch (PDOException $e) {
+            error_log("❌ Exception: " . $e->getMessage());
+            return false;
+        }
+    }    
 
-        $stmt->bindParam(':category_id', $this->category_id);
-        $stmt->bindParam(':name', $this->name);
-        $stmt->bindParam(':price', $this->price);
-        $stmt->bindParam(':description', $this->description);
-        $stmt->bindParam(':image', $this->image);
-        $stmt->bindParam(':type', $this->type);
-
-        return $stmt->execute();
-    }
-
-    // ดึงสินค้าตาม Category (สำหรับ GET)
-    public function getProductsByCategory($category_id) {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE category_id = :category_id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":category_id", $category_id);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // ดึงสินค้าทั้งหมด (สำหรับ GET)
     public function getAllProducts() {
         $query = "SELECT * FROM " . $this->table_name;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return count($products) > 0 ? $products : null;
     }
-
-    // ดึงสินค้าตามประเภท (สำหรับ GET)
+    
     public function getProductsByType($type) {
         $query = "SELECT * FROM " . $this->table_name . " WHERE type = :type";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":type", $type);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+        return count($products) > 0 ? $products : null;
     }
-
-    // เพิ่มเมธอดใหม่สำหรับ filter ทั้ง type และ category
+    
+    public function getProductsByCategory($category_id) {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE category_id = :category_id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":category_id", $category_id);
+        $stmt->execute();
+        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+        return count($products) > 0 ? $products : null;
+    }
+    
     public function getProductsByTypeAndCategory($type, $category_id) {
         $query = "SELECT * FROM " . $this->table_name . " WHERE type = :type AND category_id = :category_id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":type", $type);
         $stmt->bindParam(":category_id", $category_id);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+        return count($products) > 0 ? $products : null;
     }
+    
+    public function getProductById($product_id) {
+        $query = "SELECT p.*, c.name as category_name 
+                  FROM " . $this->table_name . " p
+                  LEFT JOIN categories c ON p.category_id = c.id
+                  WHERE p.id = ?";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$product_id]);
+        
+        return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : null;
+    }
+    
 
     // อัปเดตข้อมูลสินค้า (สำหรับ PUT)
     public function update() {
@@ -145,26 +163,6 @@ class Product {
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $this->id);
         return $stmt->execute();
-    }
-
-    // ดึงข้อมูลสินค้าตาม ID
-    public function getProductById($product_id) {
-        $query = "SELECT p.*, c.name as category_name 
-                  FROM " . $this->table_name . " p
-                  LEFT JOIN categories c ON p.category_id = c.id
-                  WHERE p.id = ?";
-        
-        try {
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute([$product_id]);
-            
-            if ($stmt->rowCount() > 0) {
-                return $stmt->fetch(PDO::FETCH_ASSOC);
-            }
-            return false;
-        } catch(PDOException $e) {
-            return false;
-        }
     }
 }
 ?>

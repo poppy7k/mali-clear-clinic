@@ -1,3 +1,5 @@
+import { ProductService } from '../../Services/ProductService.js';
+
 class ProductServiceList extends HTMLElement {
     constructor() {
         super();
@@ -20,29 +22,8 @@ class ProductServiceList extends HTMLElement {
     async fetchProducts() {
         try {
             this.setLoadingState();
-            let url = "/mali-clear-clinic/api/product/Product.php";
-            const params = new URLSearchParams();
-            
-            if (this.selectedCategory) {
-                params.append('category_id', this.selectedCategory);
-            }
-            if (this.selectedType && this.selectedType !== 'all') {
-                params.append('type', this.selectedType);
-            }
-
-            if (params.toString()) {
-                url += `?${params.toString()}`;
-            }
-
-            const response = await fetch(url);
-            const result = await response.json();
-
-            if (result.status === "success") {
-                this.products = result.data;
-                this.renderProductGrid();
-            } else {
-                this.setErrorState("ไม่พบสินค้าหรือบริการในหมวดหมู่ที่เลือก");
-            }
+            this.products = await ProductService.getAllProducts();
+            this.renderProductGrid();
         } catch (error) {
             console.error("Error fetching products:", error);
             this.setErrorState("เกิดข้อผิดพลาดในการโหลดข้อมูล");
@@ -122,14 +103,14 @@ class ProductServiceList extends HTMLElement {
     }
 
     renderProductGrid() {
-        const productList = this.querySelector('#productServiceList');
+        const productList = this.querySelector("#productServiceList");
         if (!this.products || this.products.length === 0) {
-            productList.innerHTML = `<div class="col-span-full text-center text-gray-500 py-8">ไม่พบสินค้าหรือบริการในหมวดหมู่ที่เลือก</div>`;
+            productList.innerHTML = `<p class="text-gray-500 text-center py-8">ไม่พบสินค้าหรือบริการ</p>`;
             return;
         }
 
         productList.innerHTML = this.products.map(product => {
-            const card = document.createElement('product-card');
+            const card = document.createElement("product-card");
             card.data = product;
             return card.outerHTML;
         }).join('');

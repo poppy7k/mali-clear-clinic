@@ -32,11 +32,11 @@ class CustomNavbar extends HTMLElement {
 
     renderNavLinks() {
         const links = [
-            { href: "/mali-clear-clinic/index.html", text: "Home", icon: "home.html" },
-            { href: "/mali-clear-clinic/pages/service.html", text: "Services", icon: "service.html" },
-            { href: "#", text: "Promotions", icon: "promo.html" },
-            { href: "#", text: "Blog & Tips", icon: "blog.html" },
-            { href: "#", text: "Contact Us", icon: "contact.html" }
+            { href: "/mali-clear-clinic/index.html", text: "หน้าหลัก", icon: "home.html" },
+            { href: "/mali-clear-clinic/pages/service.html", text: "สินค้าและบริการ", icon: "service.html" },
+            { href: "#", text: "โปรโมชั่น", icon: "promo.html" },
+            { href: "#", text: "บล็อกและเคล็ดลับ", icon: "blog.html" },
+            { href: "#", text: "ติดต่อเรา", icon: "contact.html" }
         ];
 
         return links.map(link => `

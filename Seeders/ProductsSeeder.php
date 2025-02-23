@@ -2,7 +2,7 @@
 require_once(__DIR__ . '/../Models/Database.php');
 require_once(__DIR__ . '/../Models/Product.php');
 
-class ProductSeeder {
+class ProductsSeeder {
     private $db;
 
     public function __construct($db) {

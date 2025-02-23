@@ -28,34 +28,18 @@ if ($method === 'GET') {
     $category_id = isset($_GET['category_id']) ? $_GET['category_id'] : null;
     $product_id = isset($_GET['product_id']) ? $_GET['product_id'] : null;
 
-    // เพิ่มเงื่อนไขการดึงข้อมูลตาม product_id
     if ($product_id) {
         $product_data = $product->getProductById($product_id);
-        if ($product_data) {
-            echo json_encode(["status" => "success", "data" => $product_data]);
-        } else {
-            echo json_encode(["status" => "error", "message" => "Product not found"]);
-        }
+        echo json_encode(["status" => $product_data ? "success" : "error", "data" => $product_data ?: "ไม่มีข้อมูล"]);
         exit;
     }
     
-    // เงื่อนไขอื่นๆ ที่มีอยู่เดิม
-    if ($type && $category_id) {
-        $products = $product->getProductsByTypeAndCategory($type, $category_id);
-    } else if ($type) {
-        $products = $product->getProductsByType($type);
-    } else if ($category_id) {
-        $products = $product->getProductsByCategory($category_id);
-    } else {
-        $products = $product->getAllProducts();
-    }
+    $products = $type && $category_id ? $product->getProductsByTypeAndCategory($type, $category_id)
+               : ($type ? $product->getProductsByType($type)
+               : ($category_id ? $product->getProductsByCategory($category_id)
+               : $product->getAllProducts()));
 
-    if ($products === false) {
-        echo json_encode(["status" => "error", "message" => "Failed to fetch products"]);
-        exit;
-    }
-
-    echo json_encode(["status" => "success", "data" => $products]);
+    echo json_encode(["status" => $products ? "success" : "error", "data" => $products ?: "ไม่มีข้อมูล"]);
     exit;
 }
 
