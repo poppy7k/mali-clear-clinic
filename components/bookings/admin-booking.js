@@ -1,6 +1,7 @@
 import { getUserSession } from "/mali-clear-clinic/scripts/auth/userSession.js";
 import BookingService from '../../services/BookingService.js';
 import { handleError } from '../../utils/ErrorHandler.js';
+import { showToast } from '../../utils/Toast.js';
 
 class AdminBooking extends HTMLElement {
     constructor() {
@@ -61,9 +62,9 @@ class AdminBooking extends HTMLElement {
                     await BookingService.deleteBooking(bookingId);
                     await this.loadBookings();
                     this.render();
-                    this.showSuccessMessage('ลบการจองสำเร็จ');
+                    showToast('success', 'ลบการจองสำเร็จ');
                 } catch (error) {
-                    this.showErrorMessage(handleError(error, 'AdminBooking'));
+                    showToast('error', handleError(error, 'AdminBooking'));
                 }
             }
         );

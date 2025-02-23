@@ -1,5 +1,6 @@
 import { AppError, ErrorTypes, handleError } from '../../utils/ErrorHandler.js';
 import { getUserSession } from "/mali-clear-clinic/scripts/auth/userSession.js";
+import { toastManager } from '../../scripts/utils/toast.js';
 
 class BookingForm extends HTMLElement {
     constructor() {
@@ -10,15 +11,19 @@ class BookingForm extends HTMLElement {
     }
 
     async connectedCallback() {
-        this.getProductDetailsFromUrl();
-        const user = await getUserSession();
-        if (!user) {
-            window.location.href = "/mali-clear-clinic/pages/login.html";
-            return;
+        try {
+            this.getProductDetailsFromUrl();
+            const user = await getUserSession();
+            if (!user) {
+                window.location.href = "/mali-clear-clinic/pages/login.html";
+                return;
+            }
+            this.userId = user.user_id;
+            const bookingForm = this.querySelector('#booking-form'); // ใช้ querySelector แทนการเข้าถึงใน shadowRoot
+            bookingForm.addEventListener('submit', this.handleFormSubmit.bind(this));
+        } catch (error) {
+            this.handleError(error);
         }
-        this.userId = user.user_id;
-        const bookingForm = this.querySelector('#booking-form'); // ใช้ querySelector แทนการเข้าถึงใน shadowRoot
-        bookingForm.addEventListener('submit', this.handleFormSubmit.bind(this));
     }
 
     getProductDetailsFromUrl() {
@@ -27,7 +32,7 @@ class BookingForm extends HTMLElement {
         const productName = urlParams.get('product_name');
         
         if (!this.productId) {
-            alert('ไม่พบข้อมูลสินค้า');
+            toastManager.addToast('error', 'ข้อผิดพลาด', 'ไม่พบข้อมูลสินค้า');
             window.location.href = '/mali-clear-clinic/pages/service.html';
             return;
         }
@@ -53,14 +58,31 @@ class BookingForm extends HTMLElement {
 
             const response = await this.submitBooking(bookingDate);
             if (response.status === 'success') {
-                this.showSuccessMessage();
+                toastManager.addToast('success', 'สำเร็จ', 'จองคิวสำเร็จ');
+                setTimeout(() => {
+                    window.location.href = '/mali-clear-clinic/pages/my-bookings.html';
+                }, 2000);
             } else {
-                throw new AppError(response.message, ErrorTypes.API_ERROR);
+                throw new AppError(response.message || 'ไม่สามารถทำการจองได้', ErrorTypes.API_ERROR);
             }
         } catch (error) {
-            const errorMessage = handleError(error, 'BookingForm');
-            this.showErrorMessage(errorMessage);
+            this.handleError(error);
         }
+    }
+
+    handleError(error) {
+        let errorMessage = "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ";
+    
+        if (error instanceof AppError) {
+            errorMessage = error.message;
+        } else if (error?.message && typeof error.message === "string") {
+            errorMessage = error.message;
+        } else {
+            errorMessage = JSON.stringify(error); // แปลงเป็นข้อความถ้าค่าไม่ใช่ string
+        }
+    
+        console.error("Toast Error:", errorMessage);
+        toastManager.addToast("error", "ข้อผิดพลาด", errorMessage);
     }
 
     async submitBooking(bookingDate) {
@@ -83,18 +105,6 @@ class BookingForm extends HTMLElement {
         } catch (error) {
             throw new AppError('ไม่สามารถทำการจองได้', ErrorTypes.NETWORK_ERROR, error);
         }
-    }
-
-    showSuccessMessage() {
-        this.querySelector('#error-message').classList.add('hidden');
-        this.querySelector('#success-message').classList.remove('hidden');
-    }
-
-    showErrorMessage(message = 'เกิดข้อผิดพลาดในการจอง กรุณาลองใหม่อีกครั้ง') {
-        const errorElement = this.querySelector('#error-message');
-        errorElement.textContent = message;
-        errorElement.classList.remove('hidden');
-        this.querySelector('#success-message').classList.add('hidden');
     }
 }
 
