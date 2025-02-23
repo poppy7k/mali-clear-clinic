@@ -1,3 +1,5 @@
+import { CategoryService } from '../../Services/CategoryService.js';
+
 class CategoryList extends HTMLElement {
     constructor() {
         super();
@@ -27,13 +29,12 @@ class CategoryList extends HTMLElement {
 
     async fetchCategories() {
         try {
-            const response = await fetch("/mali-clear-clinic/api/category/Category.php");
-            const data = await response.json();
-            console.log("Fetched Categories:", data);
+            const categories = await CategoryService.getAllCategories();
+            console.log("Fetched Categories:", categories);
 
-            if (data.status === "success") {
+            if (categories && categories.length > 0) {
                 const container = this.querySelector(".flex-col");
-                data.categories.forEach(category => {
+                categories.forEach(category => {
                     if (!category.id) return;
                     const button = document.createElement("custom-button");
                     button.className = "category-btn w-full";

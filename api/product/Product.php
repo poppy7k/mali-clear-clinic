@@ -44,6 +44,97 @@ if ($method === 'GET') {
 }
 
 if ($method === 'POST') {
+    if (isset($_POST['_method']) && $_POST['_method'] === 'PUT') {
+        try {
+            // Debug
+            error_log("Received PUT data via POST: " . print_r($_POST, true));
+            error_log("Received FILES: " . print_r($_FILES, true));
+
+            // ตรวจสอบ ID
+            if (!isset($_POST['id']) || empty($_POST['id'])) {
+                echo json_encode([
+                    "status" => "error",
+                    "message" => "Missing product ID"
+                ]);
+                exit;
+            }
+
+            // ตรวจสอบข้อมูลที่จำเป็น
+            $required_fields = ['name', 'category_id', 'price', 'type', 'status'];
+            $missing_fields = [];
+            
+            foreach ($required_fields as $field) {
+                if (!isset($_POST[$field]) || empty($_POST[$field])) {
+                    $missing_fields[] = $field;
+                }
+            }
+
+            if (!empty($missing_fields)) {
+                error_log("Missing fields: " . implode(', ', $missing_fields));
+                echo json_encode([
+                    "status" => "error", 
+                    "message" => "Missing fields: " . implode(', ', $missing_fields)
+                ]);
+                exit;
+            }
+
+            // กำหนดค่าให้กับ object
+            $product->id = $_POST['id'];
+            $product->name = $_POST['name'];
+            $product->category_id = $_POST['category_id'];
+            $product->price = $_POST['price'];
+            $product->type = $_POST['type'];
+            $product->status = $_POST['status'];
+            $product->description = $_POST['description'] ?? '';
+
+            // จัดการรูปภาพ
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $image = $_FILES['image'];
+                $image_name = time() . '-' . $image['name'];
+                $target_path = "../../assets/images/" . $image_name;
+
+                if (move_uploaded_file($image['tmp_name'], $target_path)) {
+                    // ลบรูปภาพเก่า
+                    $old_image = $product->getProductImage($product->id);
+                    if ($old_image) {
+                        $old_image_path = "../../assets/images/" . $old_image;
+                        if (file_exists($old_image_path)) {
+                            unlink($old_image_path);
+                        }
+                    }
+                    $product->image = $image_name;
+                } else {
+                    error_log("Failed to move uploaded file");
+                    echo json_encode([
+                        "status" => "error",
+                        "message" => "Failed to upload image"
+                    ]);
+                    exit;
+                }
+            }
+
+            if ($product->update()) {
+                echo json_encode([
+                    "status" => "success",
+                    "message" => "Product updated successfully"
+                ]);
+            } else {
+                echo json_encode([
+                    "status" => "error",
+                    "message" => "Failed to update product"
+                ]);
+            }
+
+        } catch (Exception $e) {
+            error_log("Error updating product: " . $e->getMessage());
+            echo json_encode([
+                "status" => "error",
+                "message" => "Server error: " . $e->getMessage()
+            ]);
+        }
+        exit;
+    }
+
     try {
         // Debug
         error_log("Received POST data: " . print_r($_POST, true));
@@ -117,28 +208,96 @@ if ($method === 'POST') {
 }
 
 if ($method === 'PUT') {
-    $data = json_decode(file_get_contents("php://input"), true);
-    
-    // ตรวจสอบข้อมูลที่จำเป็น
-    if (!isset($data['id'])) {
-        echo json_encode(["status" => "error", "message" => "Missing product ID"]);
-        exit;
-    }
+    try {
+        // รับข้อมูล PUT
+        $_PUT = [];
+        parse_str(file_get_contents("php://input"), $_PUT);
+        
+        // Debug
+        error_log("Received PUT data: " . print_r($_PUT, true));
+        error_log("Received FILES: " . print_r($_FILES, true));
 
-    // กำหนดค่าให้กับ object
-    $product->id = $data['id'];
-    $product->name = $data['name'];
-    $product->category_id = $data['category_id'];
-    $product->price = $data['price'];
-    $product->description = $data['description'] ?? '';
-    $product->image = $data['image'] ?? '';
-    $product->type = $data['type'];
-    $product->status = $data['status']; // เพิ่ม status
+        // ตรวจสอบ ID
+        if (!isset($_PUT['id']) || empty($_PUT['id'])) {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Missing product ID"
+            ]);
+            exit;
+        }
 
-    if ($product->update()) {
-        echo json_encode(["status" => "success", "message" => "Product updated successfully"]);
-    } else {
-        echo json_encode(["status" => "error", "message" => "Failed to update product"]);
+        // ตรวจสอบข้อมูลที่จำเป็น
+        $required_fields = ['name', 'category_id', 'price', 'type', 'status'];
+        $missing_fields = [];
+        
+        foreach ($required_fields as $field) {
+            if (!isset($_PUT[$field]) || empty($_PUT[$field])) {
+                $missing_fields[] = $field;
+            }
+        }
+
+        if (!empty($missing_fields)) {
+            error_log("Missing fields: " . implode(', ', $missing_fields));
+            echo json_encode([
+                "status" => "error", 
+                "message" => "Missing fields: " . implode(', ', $missing_fields)
+            ]);
+            exit;
+        }
+
+        // กำหนดค่าให้กับ object
+        $product->id = $_PUT['id'];
+        $product->name = $_PUT['name'];
+        $product->category_id = $_PUT['category_id'];
+        $product->price = $_PUT['price'];
+        $product->type = $_PUT['type'];
+        $product->status = $_PUT['status'];
+        $product->description = $_PUT['description'] ?? '';
+
+        // จัดการรูปภาพ
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $image = $_FILES['image'];
+            $image_name = time() . '-' . $image['name'];
+            $target_path = "../../assets/images/" . $image_name;
+
+            if (move_uploaded_file($image['tmp_name'], $target_path)) {
+                // ลบรูปภาพเก่า
+                $old_image = $product->getProductImage($product->id);
+                if ($old_image) {
+                    $old_image_path = "../../assets/images/" . $old_image;
+                    if (file_exists($old_image_path)) {
+                        unlink($old_image_path);
+                    }
+                }
+                $product->image = $image_name;
+            } else {
+                error_log("Failed to move uploaded file");
+                echo json_encode([
+                    "status" => "error",
+                    "message" => "Failed to upload image"
+                ]);
+                exit;
+            }
+        }
+
+        if ($product->update()) {
+            echo json_encode([
+                "status" => "success",
+                "message" => "Product updated successfully"
+            ]);
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Failed to update product"
+            ]);
+        }
+
+    } catch (Exception $e) {
+        error_log("Error updating product: " . $e->getMessage());
+        echo json_encode([
+            "status" => "error",
+            "message" => "Server error: " . $e->getMessage()
+        ]);
     }
     exit;
 }

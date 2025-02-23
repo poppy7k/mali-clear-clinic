@@ -1,5 +1,6 @@
 import { getUserSession } from '../../scripts/auth/userSession.js';
 import { toastManager } from '../../scripts/utils/toast.js';
+import { PurchaseService } from '../../Services/PurchaseService.js'; // ✅ นำเข้า PurchaseService
 
 class PurchaseHistory extends HTMLElement {
     constructor() {
@@ -16,7 +17,7 @@ class PurchaseHistory extends HTMLElement {
             }
 
             this.render();
-            await this.loadPurchases();
+            await this.loadPurchases(user.user_id); // ✅ ส่ง user.id เพื่อดึงข้อมูลจาก API
         } catch (error) {
             console.error('Error:', error);
             toastManager.addToast('error', 'ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการโหลดข้อมูล');
@@ -42,37 +43,19 @@ class PurchaseHistory extends HTMLElement {
                             </tr>
                         </thead>
                         <tbody id="purchase-list">
-                            <tr><td colspan="7" class="p-4 text-center">กำลังโหลด...</td></tr>
+                            <tr><td colspan="5" class="p-4 text-center">กำลังโหลด...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-            
-            <confirmation-modal></confirmation-modal>
         `;
     }
 
-    async loadPurchases() {
+    async loadPurchases(userId) {
         try {
-            // TODO: เรียก API เพื่อดึงข้อมูลประวัติการซื้อ
-            this.purchases = [
-                {
-                    id: 1,
-                    date: '2024-03-20',
-                    items: [
-                        {
-                            name: 'ครีมบำรุงผิว',
-                            quantity: 2,
-                            price: 590
-                        }
-                    ],
-                    totalQuantity: 2,
-                    totalAmount: 1180,
-                    status: 'completed',
-                    paymentStatus: 'paid',
-                    paymentMethod: 'credit_card'
-                }
-            ];
+            this.purchases = await PurchaseService.getUserPurchases(userId);
+
+            console.log('Loaded purchases:', this.purchases);
 
             this.renderPurchases();
         } catch (error) {
@@ -83,11 +66,11 @@ class PurchaseHistory extends HTMLElement {
 
     renderPurchases() {
         const purchaseList = this.querySelector('#purchase-list');
-        
-        if (this.purchases.length === 0) {
+
+        if (!this.purchases || this.purchases.length === 0) {
             purchaseList.innerHTML = `
                 <tr>
-                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                    <td colspan="5" class="p-4 text-center text-gray-500">
                         ไม่พบประวัติการซื้อสินค้า
                     </td>
                 </tr>
@@ -98,30 +81,26 @@ class PurchaseHistory extends HTMLElement {
         purchaseList.innerHTML = this.purchases.map(purchase => `
             <tr>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${new Date(purchase.date).toLocaleDateString('th-TH')}
+                    ${new Date(purchase.created_at).toLocaleDateString('th-TH')}
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-900">
                     <div class="space-y-1">
-                        ${purchase.items.map(item => `
-                            <div>
-                                ${item.name} x ${item.quantity}
-                                <span class="text-gray-500">
-                                    (${item.price.toLocaleString()} บาท/ชิ้น)
-                                </span>
-                            </div>
-                        `).join('')}
+                        ${purchase.product_name} x ${purchase.quantity}
+                        <span class="text-gray-500">
+                            (${parseFloat(purchase.product_price).toLocaleString()} บาท/ชิ้น)
+                        </span>
                     </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${purchase.totalQuantity} ชิ้น
+                    ${purchase.quantity} ชิ้น
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${purchase.totalAmount.toLocaleString()} บาท
+                    ${parseFloat(purchase.total_price).toLocaleString()} บาท
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${this.getStatusStyle(purchase.status)}">
-                        ${this.getStatusText(purchase.status)}
+                        ${this.getStatusStyle(purchase.status.toLowerCase())}">
+                        ${this.getStatusText(purchase.status.toLowerCase())}
                     </span>
                 </td>
             </tr>
@@ -153,45 +132,6 @@ class PurchaseHistory extends HTMLElement {
                 return 'ไม่ทราบสถานะ';
         }
     }
-
-    getPaymentStatusStyle(status) {
-        switch (status) {
-            case 'paid':
-                return 'bg-green-100 text-green-800';
-            case 'pending':
-                return 'bg-yellow-100 text-yellow-800';
-            case 'failed':
-                return 'bg-red-100 text-red-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
-        }
-    }
-
-    getPaymentStatusText(status) {
-        switch (status) {
-            case 'paid':
-                return 'ชำระเงินแล้ว';
-            case 'pending':
-                return 'รอชำระเงิน';
-            case 'failed':
-                return 'ชำระเงินไม่สำเร็จ';
-            default:
-                return 'ไม่ทราบสถานะ';
-        }
-    }
-
-    getPaymentMethodText(method) {
-        switch (method) {
-            case 'credit_card':
-                return 'บัตรเครดิต/เดบิต';
-            case 'bank_transfer':
-                return 'โอนเงินผ่านธนาคาร';
-            case 'promptpay':
-                return 'พร้อมเพย์';
-            default:
-                return 'ไม่ระบุ';
-        }
-    }
 }
 
-customElements.define('purchase-history', PurchaseHistory); 
+customElements.define('purchase-history', PurchaseHistory);

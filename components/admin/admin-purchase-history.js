@@ -1,5 +1,6 @@
 import { getUserSession } from '../../scripts/auth/userSession.js';
 import { toastManager } from '../../scripts/utils/toast.js';
+import { PurchaseService } from '../../Services/PurchaseService.js';
 
 class AdminPurchaseHistory extends HTMLElement {
     constructor() {
@@ -71,29 +72,24 @@ class AdminPurchaseHistory extends HTMLElement {
 
     async loadPurchases() {
         try {
-            // TODO: เรียก API เพื่อดึงข้อมูลประวัติการซื้อทั้งหมด
-            this.purchases = [
-                {
-                    id: 1,
-                    date: '2024-03-20',
-                    customer: {
-                        name: 'คุณสมศรี ใจดี',
-                        email: 'somsri@example.com'
-                    },
-                    items: [
-                        {
-                            name: 'ครีมบำรุงผิว',
-                            quantity: 2,
-                            price: 590
-                        }
-                    ],
-                    totalQuantity: 2,
-                    totalAmount: 1180,
-                    status: 'completed',
-                    paymentStatus: 'paid',
-                    paymentMethod: 'credit_card'
-                }
-            ];
+            const purchases = await PurchaseService.getAllPurchases();
+            this.purchases = purchases.map(purchase => ({
+                id: purchase.id,
+                date: purchase.created_at,
+                customer: {
+                    name: purchase.full_name,
+                    email: purchase.user_email,
+                    phone: purchase.phone
+                },
+                items: [{
+                    name: purchase.product_name,
+                    quantity: purchase.quantity,
+                    price: parseFloat(purchase.product_price)
+                }],
+                totalQuantity: purchase.quantity,
+                totalAmount: parseFloat(purchase.total_price),
+                status: purchase.status.toLowerCase(),
+            }));
 
             this.renderPurchases();
         } catch (error) {
@@ -113,7 +109,7 @@ class AdminPurchaseHistory extends HTMLElement {
             `;
             return;
         }
-
+    
         purchaseList.innerHTML = this.purchases.map(purchase => `
             <tr class="border-b border-gray-200 text-gray-700">
                 <td class="p-3">
@@ -122,6 +118,7 @@ class AdminPurchaseHistory extends HTMLElement {
                 <td class="p-3">
                     <div class="font-medium">${purchase.customer.name}</div>
                     <div class="text-sm text-gray-500">${purchase.customer.email}</div>
+                    <div class="text-sm text-gray-500">${purchase.customer.phone || '-'}</div>
                 </td>
                 <td class="p-3">
                     <div class="space-y-1">
@@ -138,13 +135,54 @@ class AdminPurchaseHistory extends HTMLElement {
                 <td class="p-3">${purchase.totalQuantity} ชิ้น</td>
                 <td class="p-3">${purchase.totalAmount.toLocaleString()} บาท</td>
                 <td class="p-3">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${this.getStatusStyle(purchase.status)}">
+                    <!-- Badge ที่กดได้ -->
+                    <span 
+                        class="status-badge px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                               ${this.getStatusStyle(purchase.status)}"
+                        data-purchase-id="${purchase.id}"
+                        data-current-status="${purchase.status}"
+                    >
                         ${this.getStatusText(purchase.status)}
                     </span>
                 </td>
             </tr>
         `).join('');
+    
+        // ─────────────────────────────────────────────────
+        // เพิ่ม Event Listener ให้ Badge สถานะทุกอัน
+        // ─────────────────────────────────────────────────
+        this.querySelectorAll('.status-badge').forEach(badge => {
+            badge.addEventListener('click', async () => {
+                const purchaseId = badge.getAttribute('data-purchase-id');
+                const currentStatus = badge.getAttribute('data-current-status');
+    
+                // ตัวอย่าง: วนสถานะ (Pending → Completed → Cancelled → Pending)
+                let newStatus = 'pending';
+                if (currentStatus === 'pending') {
+                    newStatus = 'completed';
+                } else if (currentStatus === 'completed') {
+                    newStatus = 'cancelled';
+                } 
+                // ถ้า currentStatus === 'cancelled' หรืออื่น ๆ → newStatus = 'pending'
+    
+                // แสดง Modal เพื่อยืนยัน
+                const confirmResult = await this.confirmationModal.show(
+                    'ยืนยันการเปลี่ยนสถานะ',
+                    `คุณต้องการเปลี่ยนสถานะจาก "${this.getStatusText(currentStatus)}" เป็น "${this.getStatusText(newStatus)}" ใช่หรือไม่?`
+                );
+    
+                if (confirmResult) {
+                    try {
+                        await PurchaseService.updateStatus(purchaseId, newStatus.toUpperCase());
+                        await this.loadPurchases();
+                        toastManager.addToast('success', 'สำเร็จ', 'อัพเดทสถานะเรียบร้อยแล้ว');
+                    } catch (error) {
+                        console.error('Error updating status:', error);
+                        toastManager.addToast('error', 'ข้อผิดพลาด', 'ไม่สามารถอัพเดทสถานะได้');
+                    }
+                }
+            });
+        });
     }
 
     getStatusStyle(status) {
@@ -186,29 +224,21 @@ class AdminPurchaseHistory extends HTMLElement {
         }
     }
 
-    getPaymentStatusText(status) {
-        switch (status) {
-            case 'paid':
-                return 'ชำระเงินแล้ว';
-            case 'pending':
-                return 'รอชำระเงิน';
-            case 'failed':
-                return 'ชำระเงินไม่สำเร็จ';
-            default:
-                return 'ไม่ทราบสถานะ';
-        }
-    }
+    async handleStatusChange(purchaseId, newStatus) {
+        try {
+            const confirmResult = await this.confirmationModal.show(
+                'ยืนยันการเปลี่ยนสถานะ',
+                `คุณต้องการเปลี่ยนสถานะเป็น "${this.getStatusText(newStatus)}" ใช่หรือไม่?`
+            );
 
-    getPaymentMethodText(method) {
-        switch (method) {
-            case 'credit_card':
-                return 'บัตรเครดิต/เดบิต';
-            case 'bank_transfer':
-                return 'โอนเงินผ่านธนาคาร';
-            case 'promptpay':
-                return 'พร้อมเพย์';
-            default:
-                return 'ไม่ระบุ';
+            if (confirmResult) {
+                await PurchaseService.updateStatus(purchaseId, newStatus.toUpperCase());
+                await this.loadPurchases();
+                toastManager.addToast('success', 'สำเร็จ', 'อัพเดทสถานะเรียบร้อยแล้ว');
+            }
+        } catch (error) {
+            console.error('Error updating status:', error);
+            toastManager.addToast('error', 'ข้อผิดพลาด', 'ไม่สามารถอัพเดทสถานะได้');
         }
     }
 }

@@ -62,9 +62,12 @@ export class ProductService {
 
     static async updateProduct(id, formData) {
         try {
+            // เพิ่ม method type เป็น POST และใส่ _method=PUT เพื่อจำลอง PUT request
+            formData.append('_method', 'PUT');
             formData.append('id', id);
+
             const response = await fetch('/mali-clear-clinic/api/product/Product.php', {
-                method: 'PUT',
+                method: 'POST',
                 body: formData
             });
             

@@ -14,6 +14,7 @@ require_once __DIR__ . '/Models/Category.php';
 require_once __DIR__ . '/Models/Product.php';
 require_once __DIR__ . '/Models/Booking.php';
 require_once __DIR__ . '/Models/Promotion.php';
+require_once __DIR__ . '/Models/Purchase.php';
 
 // ✅ ตรวจสอบและอัปเดตตารางทั้งหมด
 $tableManager->validateAndUpdateTableStructure("users", User::$schema);
@@ -21,6 +22,7 @@ $tableManager->validateAndUpdateTableStructure("categories", Category::$schema);
 $tableManager->validateAndUpdateTableStructure("products", Product::$schema);
 $tableManager->validateAndUpdateTableStructure("bookings", Booking::$schema);
 $tableManager->validateAndUpdateTableStructure("promotions", Promotion::$schema);
+$tableManager->validateAndUpdateTableStructure("purchases", Purchase::$schema);
 
 echo "✅ Database schema updated successfully!\n";
 ?>

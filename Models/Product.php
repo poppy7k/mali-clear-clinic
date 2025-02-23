@@ -125,31 +125,60 @@ class Product {
         return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : null;
     }
     
+    public function getProductImage($id) {
+        try {
+            $query = "SELECT image FROM " . $this->table_name . " WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ? $result['image'] : null;
+        } catch (PDOException $e) {
+            error_log("Error getting product image: " . $e->getMessage());
+            return null;
+        }
+    }
 
     // อัปเดตข้อมูลสินค้า (สำหรับ PUT)
     public function update() {
-        $query = "UPDATE " . $this->table_name . " 
-                 SET name = :name, 
-                     category_id = :category_id, 
-                     price = :price, 
-                     description = :description, 
-                     image = :image,
-                     type = :type,
-                     status = :status 
-                 WHERE id = :id";
+        try {
+            $query = "UPDATE " . $this->table_name . " 
+                     SET name = :name, 
+                         category_id = :category_id, 
+                         price = :price, 
+                         description = :description, 
+                         type = :type,
+                         status = :status";
 
-        $stmt = $this->conn->prepare($query);
+            // เพิ่ม image เข้าไปในคำสั่ง SQL เฉพาะเมื่อมีการอัปเดตรูปภาพ
+            if (!empty($this->image)) {
+                $query .= ", image = :image";
+            }
 
-        $stmt->bindParam(':id', $this->id);
-        $stmt->bindParam(':name', $this->name);
-        $stmt->bindParam(':category_id', $this->category_id);
-        $stmt->bindParam(':price', $this->price);
-        $stmt->bindParam(':description', $this->description);
-        $stmt->bindParam(':image', $this->image);
-        $stmt->bindParam(':type', $this->type);
-        $stmt->bindParam(':status', $this->status);
+            $query .= " WHERE id = :id";
 
-        return $stmt->execute();
+            $stmt = $this->conn->prepare($query);
+
+            // Bind parameters
+            $stmt->bindParam(':id', $this->id);
+            $stmt->bindParam(':name', $this->name);
+            $stmt->bindParam(':category_id', $this->category_id);
+            $stmt->bindParam(':price', $this->price);
+            $stmt->bindParam(':description', $this->description);
+            $stmt->bindParam(':type', $this->type);
+            $stmt->bindParam(':status', $this->status);
+
+            // Bind image parameter เฉพาะเมื่อมีการอัปเดตรูปภาพ
+            if (!empty($this->image)) {
+                $stmt->bindParam(':image', $this->image);
+            }
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error updating product: " . $e->getMessage());
+            return false;
+        }
     }
 
     // ลบสินค้า (สำหรับ DELETE)

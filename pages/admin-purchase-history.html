@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จัดการประวัติการซื้อ - Mali Clear Clinic</title>
+    <title>ประวัติการซื้อ - Mali Clear Clinic</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script src="../components/layouts/layout-navbar.js" type="module"></script>
-    <script src="../components/admin/admin-purchase-history.js" type="module"></script>
+
+    <script type="module" src="../components/layouts/layout-navbar.js"></script>
+    <script type="module" src="../components/admin/admin-purchase-history.js"></script>
     <script type="module" src="/mali-clear-clinic/components/buttons/custom-button.js"></script>
-    <script type="module" src="../components/toast/toast-container.js"></script>
+    <script type="module" src="../components/modal/confirmation-modal.js" defer></script>
+    <script type="module" src="../components/modal/loading-modal.js" defer></script>
 </head>
-<body class="bg-gray-50">
+<body class="flex flex-col min-h-screen">
     <layout-navbar></layout-navbar>
     <admin-purchase-history></admin-purchase-history>
 </body>
