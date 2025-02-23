@@ -9,7 +9,7 @@
         <script src="components/layouts/layout-footer.js" defer></script>
         <script type="module" src="components/layouts/layout-navbar.js" defer></script>
         <script src="components/contents/content-info.js" defer></script>
-        <script src="components/contents/content-promotions.js" defer></script>
+        <script type="module" src="components/contents/content-promotions.js" defer></script>
         <script src="components/buttons/custom-button.js" defer></script>
         <script type="module" src="components/modal/confirmation-modal.js" defer></script>
         <script type="module" src="components/toast/toast-container.js" defer></script>
@@ -22,21 +22,6 @@
         <div id="content" class="bg-white w-screen p-8 flex flex-col items-center">
             <content-info></content-info>
             <content-promotions></content-promotions>
-
-            <button 
-                id="test-toast-btn" 
-                class="mt-8 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-500 transition"
-            >
-                ทดสอบ Toast
-            </button>
         </div>
-
-        <script type="module">
-            import { toastManager } from "./scripts/utils/toast.js";
-
-            document.getElementById("test-toast-btn").addEventListener("click", () => {
-                toastManager.addToast("danger", "สำเร็จ!", "นี่คือข้อความทดสอบ Toast 🎉");
-            });
-        </script>
     </body>
 </html>

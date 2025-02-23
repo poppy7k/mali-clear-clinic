@@ -1,5 +1,5 @@
 import { getUserSession } from '../../scripts/auth/userSession.js';
-import { PromotionService } from '../../services/promotion-services.js';
+import { PromotionService } from '../../services/PromotionService.js';
 
 class AdminPromotions extends HTMLElement {
     constructor() {

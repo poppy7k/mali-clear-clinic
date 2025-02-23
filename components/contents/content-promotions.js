@@ -1,4 +1,4 @@
-import { PromotionService } from '../../services/promotion-services.js';
+import { PromotionService } from '../../services/PromotionService.js';
 
 class Promotions extends HTMLElement {
     constructor() {
@@ -17,14 +17,29 @@ class Promotions extends HTMLElement {
         }
     }
 
-    setLoadingState() {
-        this.innerHTML = `
-            <div class="container mx-auto py-8 text-center">
-                <h2 class="text-3xl font-bold text-gray-800 mb-8">Promotions</h2>
-                <p class="text-gray-600">กำลังโหลดโปรโมชั่น...</p>
-            </div>
-        `;
-    }
+    async setLoadingState() {
+        try {
+            const response = await fetch('/mali-clear-clinic/assets/icons/loading.html');
+            const loadingIcon = response.ok ? await response.text() : '<p>กำลังโหลด...</p>';
+            
+            this.innerHTML = `
+                <div class="container mx-auto py-8 text-center">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-8">Promotions</h2>
+                    <div class="flex justify-center items-center">
+                        ${loadingIcon}
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            console.error('Error loading loading icon:', error);
+            this.innerHTML = `
+                <div class="container mx-auto py-8 text-center">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-8">Promotions</h2>
+                    <p class="text-gray-700 opacity-75">กำลังโหลดโปรโมชั่น...</p>
+                </div>
+            `;
+        }
+    }    
 
     setErrorState(message) {
         this.innerHTML = `
