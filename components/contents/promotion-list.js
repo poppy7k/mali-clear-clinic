@@ -50,7 +50,7 @@ class ContentPromotions extends HTMLElement {
                             </div>
                             <div class="p-6">
                                 <h3 class="text-xl font-semibold text-gray-800 mb-2">${promo.title}</h3>
-                                <p class="text-gray-600 line-clamp-2">${promo.description}</p>
+                                <p class="">${promo.description}</p>
                             </div>
                             <div class="px-6 pb-4">
                                 <div class="flex items-center text-blue-600">

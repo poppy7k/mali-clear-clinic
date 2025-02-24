@@ -71,4 +71,25 @@ export class PromotionService {
             throw error;
         }
     }
+
+    static async updatePromotion(id, formData) {
+        try {
+            formData.append('_method', 'PUT'); // ✅ ใช้ `_method=PUT` เพื่อให้ PHP รู้ว่าเป็น `PUT`
+            formData.append('id', id); // ✅ ใส่ `id` ของโปรโมชั่นที่ต้องการอัปเดต
+    
+            console.log("🔹 Debug: Updating promotion ID:", id);
+            console.log("📦 FormData:", [...formData.entries()]);
+    
+            const response = await fetch('/mali-clear-clinic/api/promotion/Promotion.php', {
+                method: 'POST', // ✅ ใช้ `POST` แต่ PHP จะเข้าใจว่าเป็น `PUT`
+                body: formData
+            });
+    
+            const result = await this.handleResponse(response);
+            return result ? result : null;
+        } catch (error) {
+            console.error('❌ Error updating promotion:', error);
+            return null;
+        }
+    }
 }
