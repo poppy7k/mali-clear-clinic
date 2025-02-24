@@ -109,5 +109,45 @@ class Booking {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    function sendCompletionEmail($userId, $bookingId, $db) {
+        // ✅ ดึงข้อมูลผู้ใช้จากฐานข้อมูล
+        $stmt = $db->prepare("SELECT full_name, email FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        if (!$user) {
+            error_log("❌ User not found for user_id: $userId");
+            return;
+        }
+    
+        $email = $user['email'];
+        $name = $user['full_name'];
+        $subject = "การจอง #$bookingId เสร็จสมบูรณ์แล้ว!";
+        
+        $message = "
+            <html>
+            <head>
+                <title>การจองของคุณเสร็จสมบูรณ์</title>
+            </head>
+            <body>
+                <h3>เรียนคุณ $name,</h3>
+                <p>เราขอแจ้งให้ทราบว่า การจองของคุณ (#$bookingId) ได้รับการดำเนินการเสร็จสมบูรณ์แล้ว</p>
+                <p>ขอบคุณที่ใช้บริการของเรา!</p>
+                <p>ทีมงาน Your Company Name</p>
+            </body>
+            </html>
+        ";
+    
+        $headers = "MIME-Version: 1.0" . "\r\n";
+        $headers .= "Content-Type: text/html; charset=UTF-8" . "\r\n";
+        $headers .= "From: maliclearclinic@gmail.com" . "\r\n"; // เปลี่ยนอีเมลของคุณ
+    
+        if (mail($email, $subject, $message, $headers)) {
+            error_log("✅ Email sent to $email for Booking ID #$bookingId");
+        } else {
+            error_log("❌ Email sending failed for $email");
+        }
+    }
 }
 ?>

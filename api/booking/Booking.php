@@ -27,9 +27,23 @@ try {
 
             if ($booking->updateStatus($bookingId, $status)) {
                 echo json_encode(["status" => "success", "message" => "อัปเดตสถานะสำเร็จ"]);
+    
+                // ✅ ดึง user_id จากฐานข้อมูลของ booking
+                if ($status === 'Completed') {
+                    $stmt = $db->prepare("SELECT user_id FROM bookings WHERE id = ?");
+                    $stmt->execute([$bookingId]);
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+                    if ($result) {
+                        $booking->sendCompletionEmail($result['user_id'], $bookingId, $db);
+                    } else {
+                        error_log("❌ No user_id found for booking_id: $bookingId");
+                    }
+                }
             } else {
                 echo json_encode(["status" => "error", "message" => "ไม่สามารถอัปเดตสถานะได้"]);
             }
+            exit;
         } elseif (isset($data['user_id'], $data['product_id'], $data['full_name'], 
                         $data['phone'], $data['address'], $data['booking_date'])) {
             // ✅ กรณีสร้างการจองใหม่
