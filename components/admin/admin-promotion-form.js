@@ -33,7 +33,7 @@ class AdminPromotionForm extends HTMLElement {
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold">สร้างโปรโมชั่นใหม่</h2>
                 </div>
-
+    
                 <form id="promotion-form" class="bg-white border border-gray-200 shadow-md rounded-lg p-6">
                     <div class="grid grid-cols-1 gap-6">
                         <div>
@@ -44,16 +44,12 @@ class AdminPromotionForm extends HTMLElement {
                                 required>
                             </form-input>
                         </div>
-
+    
                         <div>
                             <label class="block text-gray-700 text-sm font-bold mb-2">รายละเอียด *</label>
-                            <form-input 
-                                type="textarea"
-                                name="description"
-                                required>
-                            </form-input>
+                            <rich-text-editor name="description"></rich-text-editor>
                         </div>
-
+    
                         <div>
                             <label class="block text-gray-700 text-sm font-bold mb-2">รูปภาพ *</label>
                             <form-input 
@@ -62,9 +58,8 @@ class AdminPromotionForm extends HTMLElement {
                                 accept="image/*"
                                 required>
                             </form-input>
-                            <p class="text-sm text-gray-500 mt-1"></p>
                         </div>
-
+    
                         <div class="flex justify-end space-x-4">
                             <custom-button 
                                 text="ยกเลิก"
@@ -111,33 +106,53 @@ class AdminPromotionForm extends HTMLElement {
 
     async handleSubmit(event) {
         event.preventDefault();
-    
+        
         try {
             const formData = new FormData(event.target);
-
-            formData.append('title', this.querySelector('form-input[name="title"] input')?.value || '');
-            formData.append('excerpt', this.querySelector('form-input[name="excerpt"] textarea')?.value || '');
-            formData.append('content', this.querySelector('rich-text-editor').getContent());
-            formData.append('status', this.querySelector('#status').value);
+    
+            // ✅ Debug 1: เช็คค่าก่อนลบ
+            console.log("🔹 Debug: FormData before removing duplicates", [...formData.entries()]);
+    
+            // ✅ ลบ `title` ที่มากับ `FormData` จาก HTML Form
+            formData.delete('title');
+            formData.delete('description');
+            formData.delete('image');
+    
+            // ✅ เพิ่ม `title` และ `description` เอง เพื่อป้องกันค่าซ้ำ
+            const titleValue = this.querySelector('form-input[name="title"] input')?.value || '';
+            const descriptionValue = this.querySelector('rich-text-editor').getContent();
+    
+            formData.append('title', titleValue);
+            formData.append('description', descriptionValue);
+    
+            // ✅ Debug 2: ตรวจสอบค่าหลังแก้ไข
+            console.log("🔹 Debug: FormData After Fixing", [...formData.entries()]);
     
             // ✅ เช็คว่ามีรูปภาพหรือไม่
             const imageInput = this.querySelector("input[name='image']");
             if (!imageInput.files.length) {
                 toastManager.addToast("error", "ข้อผิดพลาด", "กรุณาอัปโหลดรูปภาพ");
+                console.error("❌ Debug: No image uploaded");
                 return;
             }
+            formData.append("image", imageInput.files[0]);
+    
+            // ✅ Debug 3: ตรวจสอบค่าที่จะส่งไป API
+            console.log("🔹 Debug: Sending formData to API...", [...formData.entries()]);
     
             // ✅ เรียก API เพื่อสร้างโปรโมชั่น
             const response = await PromotionService.createPromotion(formData);
             
             if (response) {
+                console.log("✅ Debug: API Response:", response);
                 toastManager.addToast("success", "สำเร็จ", "สร้างโปรโมชั่นเรียบร้อยแล้ว");
                 this.navigateBack();
             } else {
+                console.error("❌ Debug: API returned an error", response);
                 toastManager.addToast("error", "ข้อผิดพลาด", "ไม่สามารถสร้างโปรโมชั่นได้");
             }
         } catch (error) {
-            console.error("Error creating promotion:", error);
+            console.error("❌ Error creating promotion:", error);
             toastManager.addToast("error", "ข้อผิดพลาด", "เกิดข้อผิดพลาดในการสร้างโปรโมชั่น");
         }
     }
