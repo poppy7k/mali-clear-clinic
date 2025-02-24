@@ -12,58 +12,58 @@ try {
 
     if ($method === 'POST') {
         $data = json_decode(file_get_contents("php://input"), true);
-        if (!isset($data['user_id'], $data['product_id'], $data['full_name'], 
-                    $data['phone'], $data['address'], $data['booking_date'])) {
-            echo json_encode(["status" => "error", "message" => "Missing required fields"]);
-            exit;
-        }
-    
-        $booking->user_id = $data['user_id'];
-        $booking->product_id = $data['product_id'];
-        $booking->full_name = $data['full_name'];
-        $booking->phone = $data['phone'];
-        $booking->address = $data['address'];
-        $booking->booking_date = $data['booking_date'];
-        $booking->status = 'Pending';
-    
-        if ($booking->create()) {
-            echo json_encode(["status" => "success", "message" => "Booking successful!"]);
+
+        if (isset($data['booking_id'], $data['status'])) {
+            // ✅ กรณีแก้ไขสถานะการจอง
+            error_log("🔹 Debug: Editing booking_id = " . $data['booking_id'] . " to status = " . $data['status']);
+
+            $bookingId = $data['booking_id'];
+            $status = $data['status'];
+
+            if (!$bookingId || !$status) {
+                echo json_encode(["status" => "error", "message" => "Missing required fields"]);
+                exit;
+            }
+
+            if ($booking->updateStatus($bookingId, $status)) {
+                echo json_encode(["status" => "success", "message" => "อัปเดตสถานะสำเร็จ"]);
+            } else {
+                echo json_encode(["status" => "error", "message" => "ไม่สามารถอัปเดตสถานะได้"]);
+            }
+        } elseif (isset($data['user_id'], $data['product_id'], $data['full_name'], 
+                        $data['phone'], $data['address'], $data['booking_date'])) {
+            // ✅ กรณีสร้างการจองใหม่
+            error_log("🔹 Debug: Creating new booking for user_id = " . $data['user_id']);
+
+            $booking->user_id = $data['user_id'];
+            $booking->product_id = $data['product_id'];
+            $booking->full_name = $data['full_name'];
+            $booking->phone = $data['phone'];
+            $booking->address = $data['address'];
+            $booking->booking_date = $data['booking_date'];
+            $booking->status = 'Pending';
+
+            if ($booking->create()) {
+                echo json_encode(["status" => "success", "message" => "Booking successful!"]);
+            } else {
+                echo json_encode(["status" => "error", "message" => "Booking failed"]);
+            }
         } else {
-            echo json_encode(["status" => "error", "message" => "Booking failed"]);
+            echo json_encode(["status" => "error", "message" => "Missing required fields"]);
         }
         exit;
     }
-    
 
     if ($method === 'GET') {
         $user_id = isset($_GET['user_id']) ? $_GET['user_id'] : null;
-        
+
         if ($user_id) {
             $bookings = $booking->getBookingsByUserId($user_id);
         } else {
             $bookings = $booking->getAll();
         }
 
-        echo json_encode([
-            "status" => "success",
-            "bookings" => $bookings
-        ]);
-        exit;
-    }
-
-    if ($method === 'PUT') {
-        $data = json_decode(file_get_contents("php://input"), true);
-        if (!isset($data['id'], $data['status'])) {
-            echo json_encode(["status" => "error", "message" => "Missing fields"]);
-            exit;
-        }
-
-        $stmt = $db->prepare("UPDATE bookings SET status = ? WHERE id = ?");
-        if ($stmt->execute([$data['status'], $data['id']])) {
-            echo json_encode(["status" => "success", "message" => "Booking updated successfully"]);
-        } else {
-            echo json_encode(["status" => "error", "message" => "Failed to update booking"]);
-        }
+        echo json_encode(["status" => "success", "bookings" => $bookings]);
         exit;
     }
 
@@ -85,19 +85,11 @@ try {
 
 } catch (PDOException $e) {
     error_log($e->getMessage());
-    echo json_encode([
-        "status" => "error",
-        "message" => "Database error occurred",
-        "error_code" => "DB_ERROR"
-    ]);
+    echo json_encode(["status" => "error", "message" => "Database error occurred", "error_code" => "DB_ERROR"]);
     exit;
 } catch (Exception $e) {
     error_log($e->getMessage());
-    echo json_encode([
-        "status" => "error",
-        "message" => "An unexpected error occurred",
-        "error_code" => "GENERAL_ERROR"
-    ]);
+    echo json_encode(["status" => "error", "message" => "An unexpected error occurred", "error_code" => "GENERAL_ERROR"]);
     exit;
 }
 

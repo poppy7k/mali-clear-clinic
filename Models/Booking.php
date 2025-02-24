@@ -75,12 +75,22 @@ class Booking {
     }
 
     // ✅ อัปเดตสถานะการจอง
-    public function updateStatus($id, $status) {
-        $query = "UPDATE " . $this->table_name . " SET status = :status WHERE id = :id";
+    public function updateStatus($bookingId, $status) {
+        $validStatuses = ['Pending', 'Confirmed', 'Cancelled'];
+        
+        if (!in_array($status, $validStatuses)) {
+            return false;
+        }
+        
+        $query = "UPDATE " . $this->table_name . " 
+                  SET status = :status 
+                  WHERE id = :id";
+        
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id);
+        
         $stmt->bindParam(':status', $status);
-
+        $stmt->bindParam(':id', $bookingId);
+        
         return $stmt->execute();
     }
 
